@@ -1,4 +1,5 @@
 var Genetic = require('genetic-js');
+var Fitness = require('./fitness.js');
 
 var genetic = Genetic.create();
 
@@ -49,10 +50,7 @@ genetic.crossover = function(mother, father) {
 };
 
 genetic.fitness = function(entity) {
-    var fitness = 0;
-    // TODO
-    // fitness = calc_fitness(entity);
-    return fitness;
+    return this.userData.calcFitness(entity);
 };
 
 genetic.generation = function(pop, generation, stats) {
@@ -75,6 +73,7 @@ var config = {
 var userData = {
     tradesLength: 100,
     orderSize: 1,
+    calcFitness: Fitness.calcFitness
 };
 
 genetic.evolve(config, userData);
