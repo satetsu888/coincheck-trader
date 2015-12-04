@@ -26,4 +26,6 @@ var fetch = function(offset){
 
 };
 
-fetch(8000);
+var offset = process.argv[2] || 0;
+
+fetch(offset);
