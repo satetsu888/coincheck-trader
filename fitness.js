@@ -4,7 +4,6 @@ module.exports = (function(){
     'use strict';
 
     var Fitness = function(){
-        this.hoge = "hogehoge";
     };
 
     Fitness.prototype.calcFitness = function(entity){
@@ -16,6 +15,7 @@ module.exports = (function(){
 
         var trader = new Trader(entity, config);
         console.log(trader);
+
 
         return trader.current_assets();
     };
