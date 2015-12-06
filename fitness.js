@@ -1,22 +1,24 @@
-var config = require('./config.js');
+var Trader = require('./trader.js');
 
 module.exports = (function(){
+    'use strict';
 
-    var calcFitness = function(entity){
-        var stat = {
+    var Fitness = function(){
+        this.hoge = "hogehoge";
+    };
+
+    Fitness.prototype.calcFitness = function(entity){
+        var config = {
             current_yen: 40000,
             current_btc: 1,
-        };
-        var calcProperty = function(stat, last_rate){
-            return stat.current_yen + stat.current_btc * last_rate;
+            rate: 40000,
         };
 
-        // TODO
+        var trader = new Trader(entity, config);
+        console.log(trader);
 
-        return calcProperty(stat, 40000);
+        return trader.current_assets();
     };
 
-    return {
-        calcFitness: calcFitness
-    };
+    return Fitness;
 })();

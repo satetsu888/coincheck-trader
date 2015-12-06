@@ -1,5 +1,6 @@
+global.base_dir = __dirname;
+
 var Genetic = require('genetic-js');
-var Fitness = require('./fitness.js');
 
 var genetic = Genetic.create();
 
@@ -50,7 +51,9 @@ genetic.crossover = function(mother, father) {
 };
 
 genetic.fitness = function(entity) {
-    return this.userData.calcFitness(entity);
+    var Fitness = require(base_dir + '/fitness.js');
+    var fitness = new Fitness();
+    return fitness.calcFitness(entity);
 };
 
 genetic.generation = function(pop, generation, stats) {
@@ -73,7 +76,6 @@ var config = {
 var userData = {
     tradesLength: 100,
     orderSize: 1,
-    calcFitness: Fitness.calcFitness
 };
 
 genetic.evolve(config, userData);
