@@ -2,6 +2,7 @@ module.exports = (function(){
     'use strict';
 
     var Trader = function(entity, config, option){
+        this.entity = entity;
         this.current_yen = config.current_yen;
         this.current_btc = config.current_btc;
 
@@ -13,8 +14,9 @@ module.exports = (function(){
         this.trades = [];
     }
 
-    Trader.prototype.updateTrades = function(){
+    Trader.prototype.updateTrades = function(trade){
         // TODO 計算対象の取引状況を更新
+        console.log('new trade: ' +  JSON.stringify(trade));
     };
 
     Trader.prototype.getOrder = function(){
