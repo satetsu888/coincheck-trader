@@ -1,7 +1,6 @@
 global.base_dir = __dirname;
 
 var Genetic = require('genetic-js');
-
 var genetic = Genetic.create();
 
 genetic.optimize = Genetic.Optimize.Maximize;
@@ -61,16 +60,21 @@ genetic.generation = function(pop, generation, stats) {
 };
 
 genetic.notification = function(pop, gen, stats, isFinished){
+
+    var Fitness = require(base_dir + '/fitness.js');
+    var fitness = new Fitness();
+    fitness.printOrder(pop[0].entity);
+
     console.log(gen);
     console.log(stats);
 };
 
 var config = {
-    "iterations": 100,
+    "iterations": 500,
     "size": 10,
     "crossover": 0.3,
     "mutation": 0.3,
-    "skip": 0
+    "skip": 100
 };
 
 var userData = {

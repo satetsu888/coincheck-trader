@@ -44,7 +44,7 @@ module.exports = (function(){
         if(score < -1 * order_threshold){
             this.orders.push({
                 rate: this.current_rate(),
-                amount: 1,
+                amount: 0.03,
                 order_type: "sell",
                 pair: "btc_jpy",
                 is_open: true,
@@ -54,7 +54,7 @@ module.exports = (function(){
         } else if(order_threshold < score){
             this.orders.push({
                 rate: this.current_rate(),
-                amount: 1,
+                amount: 0.03,
                 order_type: "buy",
                 pair: "btc_jpy",
                 is_open: true,
@@ -82,7 +82,7 @@ module.exports = (function(){
 
             if(order.order_type == "buy"){
                 if(trade.rate <= order.rate){
-                    var traded_amount = Math.max(order.amount, trade.amount);
+                    var traded_amount = Math.min(order.amount, trade.amount);
                     order.amount -= traded_amount;
                     if(order.amount <= 0){
                         order.is_open = false;
@@ -92,7 +92,7 @@ module.exports = (function(){
                 }
             } else if(order.order_type == "sell"){
                 if(trade.rate >= order.rate){
-                    var traded_amount = Math.max(order.amount, trade.amount);
+                    var traded_amount = Math.min(order.amount, trade.amount);
                     order.amount -= traded_amount;
                     if(order.amount <= 0){
                         order.is_open = false;

@@ -9,7 +9,7 @@ module.exports = (function(){
     var Fitness = function(){
     };
 
-    Fitness.prototype.calcFitness = function(entity, cb){
+    Fitness.prototype.calcFitness = function(entity){
         var config = {
             current_yen: 0,
             current_btc: 0,
@@ -20,14 +20,32 @@ module.exports = (function(){
         };
 
         var trader = new Trader(entity, config, option);
-        fs.createReadStream('train_test.json', {encoding: 'utf8'})
-        .pipe(JSONstream.parse('*'))
-        .on('data', function(trade){
+        var train = JSON.parse(fs.readFileSync('train_test.json', 'utf8'));
+        train.forEach(function(trade){
             trader.updateTrades(trade);
-        })
-        .on('end', function(){
-            cb(trader.current_assets());
         });
+        return trader.current_assets();
+    };
+
+    Fitness.prototype.printOrder = function(entity){
+        console.log(entity);
+        var config = {
+            current_yen: 0,
+            current_btc: 0,
+        };
+        var option = {
+            calc_weight: 0.0001,
+            order_threshold: 20,
+        };
+
+        var trader = new Trader(entity, config, option);
+        var train = JSON.parse(fs.readFileSync('train_test.json', 'utf8'));
+        train.forEach(function(trade){
+            trader.updateTrades(trade);
+        });
+
+        console.log(trader.orders);
+        console.log(trader.orders.length);
     };
 
     return Fitness;
