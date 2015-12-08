@@ -16,7 +16,7 @@ module.exports = (function(){
         };
         var option = {
             calc_weight: 0.0001,
-            order_threshold: 100,
+            order_threshold: 20,
         };
 
         var trader = new Trader(entity, config, option);
