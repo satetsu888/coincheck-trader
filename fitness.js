@@ -11,11 +11,12 @@ module.exports = (function(){
 
     Fitness.prototype.calcFitness = function(entity, cb){
         var config = {
-            current_yen: 40000,
-            current_btc: 1,
-            rate: 40000,
+            current_yen: 0,
+            current_btc: 0,
         };
         var option = {
+            calc_weight: 0.0001,
+            order_threshold: 100,
         };
 
         var trader = new Trader(entity, config, option);
