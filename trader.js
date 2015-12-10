@@ -31,7 +31,7 @@ module.exports = (function(){
         if(score < -1 * order_threshold){
             this.orders.push({
                 rate: this.current_rate(),
-                amount: 0.03,
+                amount: 0.01,
                 order_type: "sell",
                 pair: "btc_jpy",
                 is_open: true,
@@ -41,7 +41,7 @@ module.exports = (function(){
         } else if(order_threshold < score){
             this.orders.push({
                 rate: this.current_rate(),
-                amount: 0.03,
+                amount: 0.01,
                 order_type: "buy",
                 pair: "btc_jpy",
                 is_open: true,

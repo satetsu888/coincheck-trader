@@ -21,7 +21,7 @@ module.exports = (function(){
         };
         var option = {
             calc_weight: 0.0001,
-            order_threshold: 20,
+            order_threshold: 30,
         };
 
         var trader = new Trader(entity, config, option);
@@ -42,7 +42,7 @@ module.exports = (function(){
         };
         var option = {
             calc_weight: 0.0001,
-            order_threshold: 20,
+            order_threshold: 30,
         };
 
         var trader = new Trader(entity, config, option);
@@ -61,8 +61,8 @@ module.exports = (function(){
        return JSON.stringify(entity);
     };
 
-    var Fitness = function(){
-        this.train = JSON.parse(fs.readFileSync('train_test.json', 'utf8'));
+    var Fitness = function(file){
+        this.train = JSON.parse(fs.readFileSync(file, 'utf8'));
         this.cache = {};
         this.calcFitness = calcFitness;
         this.printOrder = printOrder;

@@ -67,17 +67,17 @@ genetic.notification = function(pop, gen, stats, isFinished){
 };
 
 var config = {
-    "iterations": 100,
-    "size": 8,
+    "iterations": 30,
+    "size": 10,
     "crossover": 0.3,
     "mutation": 0.3,
-    "skip": 10
+    "skip": 0
 };
 
 var userData = {
     tradesLength: 100,
     orderSize: 1,
-    fitness: new Fitness(),
+    fitness: new Fitness('train_mini.json'),
 };
 
 genetic.evolve(config, userData);
