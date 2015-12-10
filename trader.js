@@ -1,20 +1,7 @@
 module.exports = (function(){
     'use strict';
 
-    var Trader = function(entity, config, option){
-        this.entity = entity;
-        this.current_yen = config.current_yen;
-        this.current_btc = config.current_btc;
-
-        this.api = option.api; // TODO coincheckのAPIとつなぐ
-        this.calc_weight = option.calc_weight || 0.0001;
-        this.order_threshold = option.order_threshold || 100;
-
-        this.orders = [];
-        this.trades = [];
-    }
-
-    Trader.prototype.updateTrades = function(trade){
+    var updateTrades = function(trade){
         this.applyOrder(trade);
         this.trades.push(trade);
         if(this.trades.length > 100){
@@ -23,7 +10,7 @@ module.exports = (function(){
         }
     };
 
-    Trader.prototype.createOrder = function(trades){
+    var createOrder = function(trades){
         var entity = this.entity;
         var calc_weight = this.calc_weight;
         var order_threshold = this.order_threshold;
@@ -63,7 +50,7 @@ module.exports = (function(){
         }
     };
 
-    Trader.prototype.applyOrder = function(trade){
+    var applyOrder = function(trade){
         // TODO 発行した注文の約定と資産の更新を行う
         var trader = this;
 
@@ -104,21 +91,42 @@ module.exports = (function(){
         });
     };
 
-    Trader.prototype.current_assets = function(){
+    var current_assets = function(){
         return this.current_yen + this.current_btc * this.current_rate();
     };
 
-    Trader.prototype.current_rate = function(){
+    var current_rate = function(){
         var last_trade = this.trades[this.trades.length-1] || 0;
 
         return last_trade.rate;
     };
 
-    Trader.prototype.current_ts = function(){
+    var current_ts = function(){
         var last_trade = this.trades[this.trades.length-1] || 0;
 
         return last_trade.created_at;
     };
+
+
+    var Trader = function(entity, config, option){
+        this.entity = entity;
+        this.current_yen = config.current_yen;
+        this.current_btc = config.current_btc;
+
+        this.api = option.api; // TODO coincheckのAPIとつなぐ
+        this.calc_weight = option.calc_weight || 0.0001;
+        this.order_threshold = option.order_threshold || 100;
+
+        this.orders = [];
+        this.trades = [];
+
+        this.updateTrades = updateTrades;
+        this.createOrder = createOrder;
+        this.applyOrder = applyOrder;
+        this.current_assets = current_assets;
+        this.current_rate = current_rate;
+        this.current_ts = current_ts;
+    }
 
     return Trader;
 })();

@@ -2,6 +2,7 @@ global.base_dir = __dirname;
 
 var Genetic = require('genetic-js');
 var genetic = Genetic.create();
+var Fitness = require(base_dir + '/fitness.js');
 
 genetic.optimize = Genetic.Optimize.Maximize;
 genetic.select1 = Genetic.Select1.Tournament2;
@@ -50,9 +51,7 @@ genetic.crossover = function(mother, father) {
 };
 
 genetic.fitness = function(entity) {
-    var Fitness = require(base_dir + '/fitness.js');
-    var fitness = new Fitness();
-    return fitness.calcFitness(entity);
+    return this.userData.fitness.calcFitness(entity);
 };
 
 genetic.generation = function(pop, generation, stats) {
@@ -70,16 +69,17 @@ genetic.notification = function(pop, gen, stats, isFinished){
 };
 
 var config = {
-    "iterations": 500,
-    "size": 10,
+    "iterations": 100,
+    "size": 8,
     "crossover": 0.3,
     "mutation": 0.3,
-    "skip": 100
+    "skip": 10
 };
 
 var userData = {
     tradesLength: 100,
     orderSize: 1,
+    fitness: new Fitness(),
 };
 
 genetic.evolve(config, userData);

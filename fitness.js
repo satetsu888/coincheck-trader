@@ -1,4 +1,3 @@
-var Trader = require('./trader.js');
 var fs = require('fs');
 
 var JSONstream = require('JSONstream');
@@ -6,10 +5,12 @@ var JSONstream = require('JSONstream');
 module.exports = (function(){
     'use strict';
 
-    var Fitness = function(){
-    };
+    global.base_dir = __dirname;
+    var Trader = require(base_dir + '/trader.js');
 
-    Fitness.prototype.calcFitness = function(entity){
+    var calcFitness = function(entity){
+        var Trader = require(base_dir + '/trader.js');
+
         var config = {
             current_yen: 0,
             current_btc: 0,
@@ -20,14 +21,14 @@ module.exports = (function(){
         };
 
         var trader = new Trader(entity, config, option);
-        var train = JSON.parse(fs.readFileSync('train_test.json', 'utf8'));
-        train.forEach(function(trade){
+        this.train.forEach(function(trade){
             trader.updateTrades(trade);
         });
         return trader.current_assets();
     };
 
-    Fitness.prototype.printOrder = function(entity){
+    var printOrder = function(entity){
+        var Trader = require(base_dir + '/trader.js');
         console.log(entity);
         var config = {
             current_yen: 0,
@@ -39,13 +40,21 @@ module.exports = (function(){
         };
 
         var trader = new Trader(entity, config, option);
-        var train = JSON.parse(fs.readFileSync('train_test.json', 'utf8'));
-        train.forEach(function(trade){
+        this.train.forEach(function(trade){
             trader.updateTrades(trade);
         });
 
-        console.log(trader.orders);
-        console.log(trader.orders.length);
+        console.log("order_num: " + trader.orders.length);
+        console.log("current_yen: " + trader.current_yen);
+        console.log("current_btc:" + trader.current_btc);
+        console.log("current_rate: " + trader.current_rate());
+        console.log("current_assets: " + trader.current_assets());
+    };
+
+    var Fitness = function(){
+        this.train = JSON.parse(fs.readFileSync('train_test.json', 'utf8'));
+        this.calcFitness = calcFitness;
+        this.printOrder = printOrder;
     };
 
     return Fitness;
