@@ -26,6 +26,6 @@ var fetch = function(offset){
 
 };
 
-var offset = process.argv[2] || 0;
+var offset = parseInt(process.argv[2]) || 0;
 
 fetch(offset);
