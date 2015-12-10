@@ -6,9 +6,13 @@ module.exports = (function(){
     'use strict';
 
     global.base_dir = __dirname;
-    var Trader = require(base_dir + '/trader.js');
 
     var calcFitness = function(entity){
+        var seriarized_entity = this.seriarize(entity);
+        if(this.cache[seriarized_entity]){
+            return this.cache[seriarized_entity];
+        }
+
         var Trader = require(base_dir + '/trader.js');
 
         var config = {
@@ -24,6 +28,8 @@ module.exports = (function(){
         this.train.forEach(function(trade){
             trader.updateTrades(trade);
         });
+
+        this.cache[seriarized_entity] = trader.current_assets();
         return trader.current_assets();
     };
 
@@ -51,10 +57,16 @@ module.exports = (function(){
         console.log("current_assets: " + trader.current_assets());
     };
 
+    var seriarize = function(entity){
+       return JSON.stringify(entity);
+    };
+
     var Fitness = function(){
         this.train = JSON.parse(fs.readFileSync('train_test.json', 'utf8'));
+        this.cache = {};
         this.calcFitness = calcFitness;
         this.printOrder = printOrder;
+        this.seriarize = seriarize;
     };
 
     return Fitness;

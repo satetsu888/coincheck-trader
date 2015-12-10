@@ -60,9 +60,7 @@ genetic.generation = function(pop, generation, stats) {
 
 genetic.notification = function(pop, gen, stats, isFinished){
 
-    var Fitness = require(base_dir + '/fitness.js');
-    var fitness = new Fitness();
-    fitness.printOrder(pop[0].entity);
+    this.userData.fitness.printOrder(pop[0].entity);
 
     console.log(gen);
     console.log(stats);
