@@ -27,8 +27,9 @@ module.exports = (function(){
             var delta = sign * element.amount * element.rate * entity[index] * calc_weight;
             score += delta;
         });
+        score += 100 * entity[100] * (this.current_yen / this.current_rate() - this.current_btc);
 
-        if(score < -1 * order_threshold){
+        if(score < -1 * order_threshold && this.current_btc > 0.01){
             this.orders.push({
                 rate: this.current_rate(),
                 amount: 0.01,
@@ -38,7 +39,7 @@ module.exports = (function(){
                 created_at: this.current_ts(),
 
             })
-        } else if(order_threshold < score){
+        } else if(order_threshold < score && (this.current_yen / this.current_rate()) > 0.01){
             this.orders.push({
                 rate: this.current_rate(),
                 amount: 0.01,
@@ -51,7 +52,6 @@ module.exports = (function(){
     };
 
     var applyOrder = function(trade){
-        // TODO 発行した注文の約定と資産の更新を行う
         var trader = this;
 
         this.orders.forEach(function(order, index){

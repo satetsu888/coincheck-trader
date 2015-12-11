@@ -27,7 +27,8 @@ genetic.mutate = function(entity) {
         return entity;
     }
 
-    return mutateAt(entity, Math.floor(Math.random() * this.userData["tradesLength"]));
+    //return mutateAt(entity, Math.floor(Math.random() * this.userData["tradesLength"]));
+    return mutateAt(entity, 100);
 };
 
 genetic.crossover = function(mother, father) {
@@ -67,15 +68,15 @@ genetic.notification = function(pop, gen, stats, isFinished){
 };
 
 var config = {
-    "iterations": 30,
-    "size": 10,
-    "crossover": 0.3,
-    "mutation": 0.3,
+    "iterations": 10,
+    "size": 20,
+    "crossover": 0.4,
+    "mutation": 0.4,
     "skip": 0
 };
 
 var userData = {
-    tradesLength: 100,
+    tradesLength: 101,
     orderSize: 1,
     fitness: new Fitness('train_mini.json'),
 };

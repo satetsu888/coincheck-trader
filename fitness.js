@@ -16,8 +16,8 @@ module.exports = (function(){
         var Trader = require(base_dir + '/trader.js');
 
         var config = {
-            current_yen: 0,
-            current_btc: 0,
+            current_yen: 50000,
+            current_btc: 1,
         };
         var option = {
             calc_weight: 0.0001,
@@ -35,10 +35,10 @@ module.exports = (function(){
 
     var printOrder = function(entity){
         var Trader = require(base_dir + '/trader.js');
-        console.log(entity);
+        console.log(JSON.stringify(entity));
         var config = {
-            current_yen: 0,
-            current_btc: 0,
+            current_yen: 50000,
+            current_btc: 1,
         };
         var option = {
             calc_weight: 0.0001,
@@ -50,7 +50,17 @@ module.exports = (function(){
             trader.updateTrades(trade);
         });
 
+        var buy = 0;
+        var sell = 0;
+        trader.orders.forEach(function(e){
+            if(e.order_type == 'buy'){
+                buy++;
+            } else {
+                sell++;
+            }
+        });
         console.log("order_num: " + trader.orders.length);
+        console.log("order: sell: " + sell + " buy: " + buy);
         console.log("current_yen: " + trader.current_yen);
         console.log("current_btc:" + trader.current_btc);
         console.log("current_rate: " + trader.current_rate());
