@@ -12,9 +12,14 @@ genetic.seed = function() {
     var length = this.userData["tradesLength"];
     var orderSize = this.userData["orderSize"];
 
+    var createRand = function(orderSize){
+        var rand = Math.random() * orderSize * 2 - orderSize;
+        return Math.floor(rand * 100000) / 100000;
+    };
+
     var seed = new Array(length);
     for(var i = 0; i < length; i++){
-        seed[i] = Math.random() * orderSize * 2 - orderSize;
+        seed[i] = createRand(orderSize);
     }
     return seed;
 };
@@ -23,12 +28,17 @@ genetic.mutate = function(entity) {
     var orderSize = this.userData["orderSize"];
 
     function mutateAt(entity, index) {
-        entity[index] = Math.random() * orderSize * 2 - orderSize;
+        var rand = Math.random() * orderSize * 2 - orderSize;
+        entity[index] = Math.floor(rand * 100000) / 100000;
         return entity;
     }
 
+    for(var i=0;i<entity.length / 2 ; i++){
+        entity = mutateAt(entity, Math.floor(Math.random() * this.userData["tradesLength"]));
+    }
+    return entity;
     //return mutateAt(entity, Math.floor(Math.random() * this.userData["tradesLength"]));
-    return mutateAt(entity, 100);
+    //return mutateAt(entity, 100);
 };
 
 genetic.crossover = function(mother, father) {
@@ -61,24 +71,24 @@ genetic.generation = function(pop, generation, stats) {
 
 genetic.notification = function(pop, gen, stats, isFinished){
 
-    this.userData.fitness.printOrder(pop[0].entity);
+    this.userData.fitness.printStats(pop[0].entity);
 
     console.log(gen);
     console.log(stats);
 };
 
 var config = {
-    "iterations": 10,
+    "iterations": 30,
     "size": 20,
-    "crossover": 0.4,
-    "mutation": 0.4,
+    "crossover": 0.5,
+    "mutation": 0.2,
     "skip": 0
 };
 
 var userData = {
-    tradesLength: 101,
+    tradesLength: 102,
     orderSize: 1,
-    fitness: new Fitness('train_mini.json'),
+    fitness: new Fitness('train.json'),
 };
 
 genetic.evolve(config, userData);

@@ -27,25 +27,28 @@ module.exports = (function(){
             var delta = sign * element.amount * element.rate * entity[index] * calc_weight;
             score += delta;
         });
-        score += 100 * entity[100] * (this.current_yen / this.current_rate() - this.current_btc);
+        score += 10 * entity[100] * (this.current_yen / this.current_rate() - this.current_btc);
 
+        var amount = Math.floor(Math.abs(0.0001 * score * entity[101]) * 10000) / 10000;
         if(score < -1 * order_threshold && this.current_btc > 0.01){
             this.orders.push({
                 rate: this.current_rate(),
-                amount: 0.01,
+                amount: amount,
+                original_amount: amount,
                 order_type: "sell",
                 pair: "btc_jpy",
-                is_open: true,
+                status: "open",
                 created_at: this.current_ts(),
 
             })
         } else if(order_threshold < score && (this.current_yen / this.current_rate()) > 0.01){
             this.orders.push({
                 rate: this.current_rate(),
-                amount: 0.01,
+                amount: amount,
+                original_amount: amount,
                 order_type: "buy",
                 pair: "btc_jpy",
-                is_open: true,
+                status: "open",
                 created_at: this.current_ts(),
             })
         }
@@ -55,7 +58,7 @@ module.exports = (function(){
         var trader = this;
 
         this.orders.forEach(function(order, index){
-            if(!order.is_open){
+            if(order.status != "open"){
                 return;
             }
 
@@ -63,7 +66,7 @@ module.exports = (function(){
             order_cancel_date.setDate(order_cancel_date.getDate() + 1);
             var trade_date = new Date(trade.created_at);
             if(order_cancel_date  < trade.created_at){
-                order.is_open = false;
+                order.status = "canceled";
                 return;
             }
 
@@ -72,7 +75,7 @@ module.exports = (function(){
                     var traded_amount = Math.min(order.amount, trade.amount);
                     order.amount -= traded_amount;
                     if(order.amount <= 0){
-                        order.is_open = false;
+                        order.status = "closed";
                     }
                     trader.current_btc += traded_amount;
                     trader.current_yen -= traded_amount * trade.rate;
@@ -82,7 +85,7 @@ module.exports = (function(){
                     var traded_amount = Math.min(order.amount, trade.amount);
                     order.amount -= traded_amount;
                     if(order.amount <= 0){
-                        order.is_open = false;
+                        order.status = "closed";
                     }
                     trader.current_btc -= traded_amount;
                     trader.current_yen += traded_amount * trade.rate;
