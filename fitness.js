@@ -7,7 +7,7 @@ module.exports = (function(){
 
     global.base_dir = __dirname;
 
-    var calcFitness = function(entity){
+    var calcAssets = function(entity){
         var trader = this.doFitness(entity);
         return trader.current_assets();
     };
@@ -71,7 +71,7 @@ module.exports = (function(){
     var Fitness = function(file){
         this.train = JSON.parse(fs.readFileSync(file, 'utf8'));
         this.cache = {};
-        this.calcFitness = calcFitness;
+        this.calcAssets = calcAssets;
         this.printStats = printStats;
         this.printOrder = printOrder;
         this.doFitness = doFitness;
