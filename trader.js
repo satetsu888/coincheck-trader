@@ -1,12 +1,16 @@
 module.exports = (function(){
     'use strict';
 
-    var updateTrades = function(trade){
+    var updateTrades = function(trade, cb){
         this.applyOrder(trade);
         this.trades.push(trade);
+        this.update_count++;
         if(this.trades.length > 100){
             this.trades.shift();
             this.createOrder(this.trades);
+        }
+        if(cb){
+            cb(this);
         }
     };
 
@@ -113,8 +117,10 @@ module.exports = (function(){
 
     var Trader = function(entity, config, option){
         this.entity = entity;
-        this.current_yen = config.current_yen;
-        this.current_btc = config.current_btc;
+        this.current_yen = config.jpy;
+        this.current_btc = config.btc;
+
+        this.update_count = 0;
 
         this.api = option.api; // TODO coincheckのAPIとつなぐ
         this.calc_weight = option.calc_weight || 0.0001;

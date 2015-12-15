@@ -47,8 +47,8 @@ module.exports = (function(){
 
         var Trader = require(base_dir + '/trader.js');
         var config = {
-            current_yen: 50000,
-            current_btc: 0,
+            jpy: 50000,
+            btc: 0,
         };
         var option = {
             calc_weight: 0.0001,

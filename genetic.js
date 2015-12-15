@@ -62,7 +62,7 @@ genetic.crossover = function(mother, father) {
 };
 
 genetic.fitness = function(entity) {
-    return this.userData.fitness.calcAseets(entity);
+    return this.userData.fitness.calcAssets(entity);
 };
 
 genetic.generation = function(pop, generation, stats) {
