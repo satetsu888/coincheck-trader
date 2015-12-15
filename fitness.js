@@ -53,6 +53,8 @@ module.exports = (function(){
         var option = {
             calc_weight: 0.0001,
             order_threshold: 200,
+            order_applyed: true,
+            order_allowed: true,
         };
 
         var trader = new Trader(entity, config, option);

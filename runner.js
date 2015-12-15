@@ -32,6 +32,13 @@ var setupTraderAsync = function(res){
     });
 };
 
+var allowCreateOrderAsync = function(){
+    return new Promise(function(resolve, reject){
+        trader.order_allowed = true;
+        resolve();
+    });
+};
+
 var fetchTradesAsync = function(offset){
     return new Promise(function(resolve, reject){
         request.get(
@@ -101,5 +108,6 @@ getBalanceAsync()
 .then(setupTraderAsync)
 .then(update(100))
 .then(update(50))
+.then(allowCreateOrderAsync)
 .then(mainloop);
 

@@ -2,12 +2,16 @@ module.exports = (function(){
     'use strict';
 
     var updateTrades = function(trade, cb){
-        this.applyOrder(trade);
+        if(this.order_applyed){
+            this.applyOrder(trade);
+        }
         this.trades.push(trade);
         this.update_count++;
         if(this.trades.length > 100){
             this.trades.shift();
-            this.createOrder(this.trades);
+            if(this.order_allowed){
+                this.createOrder(this.trades);
+            }
         }
         if(cb){
             cb(this);
@@ -125,6 +129,8 @@ module.exports = (function(){
         this.api = option.api; // TODO coincheckのAPIとつなぐ
         this.calc_weight = option.calc_weight || 0.0001;
         this.order_threshold = option.order_threshold || 100;
+        this.order_applyed = option.order_applyed || false;
+        this.order_allowed = option.order_allowed || false;
 
         this.orders = [];
         this.trades = [];
