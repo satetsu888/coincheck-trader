@@ -80,12 +80,19 @@ var update = function(offset){
     }
 };
 
+var sleep = function(){
+    return new Promise(function(resolve, reject){
+        setTimeout(resolve, 5000);
+    });
+};
+
 var mainloop = function(){
     return new Promise(function(resolve, reject){
         (update(0))()
         .then(function(trader) {
             console.log(trader.orders);
         })
+        .then(sleep)
         .then(mainloop);
     });
 };
