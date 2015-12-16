@@ -5,7 +5,6 @@ var request = require('request');
 
 var fs = require('fs');
 var coincheck = require('node-coincheck');
-var Promise = require('bluebird');
 var publicApi = coincheck.PublicApi;
 var privateApi = coincheck.createPrivateApi(config.coincheck.apikey, config.coincheck.secretkey, 'user agent is node-coincheck');
 
@@ -26,6 +25,7 @@ var setupTraderAsync = function(res){
         var option = {
             calc_weight: 0.0001,
             order_threshold: 200,
+            order_allowed: false,
         };
         trader = new Trader(entity, res, option);
         resolve();
