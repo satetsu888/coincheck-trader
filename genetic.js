@@ -62,7 +62,22 @@ genetic.crossover = function(mother, father) {
 };
 
 genetic.fitness = function(entity) {
-    return this.userData.fitness.calcAssets(entity);
+    var Fiber = require('fibers');
+
+    var score;
+    var fn = Fiber(function(f){
+        score = f.calcAssets(entity, function(result){
+            console.log(result);
+            score = result;
+            console.log(score);
+            throw new Error('end');
+        });
+        console.log("before yield");
+        Fiber.yield();
+        console.log("after yield");
+    }).run(this.userData.fitness);
+
+    return score;
 };
 
 genetic.generation = function(pop, generation, stats) {
@@ -71,7 +86,7 @@ genetic.generation = function(pop, generation, stats) {
 
 genetic.notification = function(pop, gen, stats, isFinished){
 
-    this.userData.fitness.printStats(pop[0].entity);
+    //this.userData.fitness.printStats(pop[0].entity);
 
     console.log(gen);
     console.log(stats);

@@ -1,18 +1,29 @@
 var fs = require('fs');
-
-var JSONstream = require('JSONstream');
+var co = require('co');
 
 module.exports = (function(){
     'use strict';
 
+
     global.base_dir = __dirname;
 
-    var calcAssets = function(entity){
-        var trader = this.doFitness(entity);
-        return trader.current_assets();
+    var calcAssets = function(entity, callback){
+        var self = this;
+        co(function* (){
+            return yield self.doFitnessAsync(entity);
+        }).then(function(trader){
+            callback(trader.current_assets());
+        });
     };
 
-    var printStats = function(entity){
+    var calcAssetsAsync = function(entity){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            self.calcAssets(entity, resolve);
+        });
+    };
+
+    var printStats = function(entity, callback){
         console.log(JSON.stringify(entity));
 
         var trader = this.doFitness(entity);
@@ -34,15 +45,11 @@ module.exports = (function(){
         console.log("current_assets: " + trader.current_assets());
     };
 
-    var printOrder = function(entity){
-        var trader = this.doFitness(entity);
-        console.log(trader.orders);
-    };
-
-    var doFitness = function(entity){
-        var seriarized_entity = this.seriarize(entity);
-        if(this.cache[seriarized_entity]){
-            return this.cache[seriarized_entity];
+    var doFitness = function(entity, callback){
+        var self = this;
+        var seriarized_entity = self.seriarize(entity);
+        if(self.cache[seriarized_entity]){
+            callback(self.cache[seriarized_entity]);
         }
 
         var Trader = require(base_dir + '/trader.js');
@@ -53,30 +60,45 @@ module.exports = (function(){
         var option = {
             calc_weight: 0.0001,
             order_threshold: 200,
-            order_applyed: true,
             order_allowed: true,
+            api: self.api,
         };
 
         var trader = new Trader(entity, config, option);
-        this.train.forEach(function(trade){
-            trader.updateTrades(trade);
-        });
 
-        this.cache[seriarized_entity] = trader;
-        return this.cache[seriarized_entity];
+        co(function* (){
+            for(var i=0; i<self.train.length; i++){
+                yield trader.updateTradesAsync(self.train[i]);
+            }
+            console.log("finish");
+            self.cache[seriarized_entity] = trader;
+            callback(self.cache[seriarized_entity]);    
+        }).catch(function(err){
+            console.log(err);
+        });
+    };
+
+    var doFitnessAsync = function(entity){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            self.doFitness(entity, resolve);
+        });
     };
 
     var seriarize = function(entity){
        return JSON.stringify(entity);
     };
+    var api = require(base_dir + '/api_mock.js');
 
     var Fitness = function(file){
         this.train = JSON.parse(fs.readFileSync(file, 'utf8'));
+        this.api = new api(),
         this.cache = {};
         this.calcAssets = calcAssets;
+        this.calcAssetsAsync = calcAssetsAsync;
         this.printStats = printStats;
-        this.printOrder = printOrder;
         this.doFitness = doFitness;
+        this.doFitnessAsync = doFitnessAsync;
         this.seriarize = seriarize;
     };
 

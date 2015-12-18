@@ -1,27 +1,37 @@
 module.exports = (function(){
     'use strict';
 
+    var co = require('co');
+
     var updateTrades = function(trade, cb){
-        if(this.order_applyed){
-            this.applyOrder(trade);
-        }
-        this.trades.push(trade);
-        this.update_count++;
-        if(this.trades.length > 100){
-            this.trades.shift();
-            if(this.order_allowed){
-                this.createOrder(this.trades);
+        var self = this;
+        self.trades.push(trade);
+        self.update_count++;
+        if(self.trades.length > 100){
+            self.trades.shift();
+            if(self.order_allowed){
+                self.createOrder(self.trades, cb);
+            } else {
+                console.log("order not allowed");
+                cb(self);
             }
-        }
-        if(cb){
-            cb(this);
+        } else {
+            cb(self);
         }
     };
 
-    var createOrder = function(trades){
-        var entity = this.entity;
-        var calc_weight = this.calc_weight;
-        var order_threshold = this.order_threshold;
+    var updateTradesAsync = function(trade){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            self.updateTrades(trade, resolve);
+        });
+    };
+
+    var createOrder = function(trades, cb){
+        var self = this;
+        var entity = self.entity;
+        var calc_weight = self.calc_weight;
+        var order_threshold = self.order_threshold;
 
         var score = 0;
         var sign;
@@ -35,72 +45,33 @@ module.exports = (function(){
             var delta = sign * element.amount * element.rate * entity[index] * calc_weight;
             score += delta;
         });
-        score += 10 * entity[100] * (this.current_yen / this.current_rate() - this.current_btc);
+        score += 10 * entity[100] * (self.current_yen / self.current_rate() - self.current_btc);
 
         var amount = Math.floor(Math.abs(0.0001 * score * entity[101]) * 10000) / 10000;
-        if(score < -1 * order_threshold && this.current_btc > 0.01){
-            this.orders.push({
-                rate: this.current_rate(),
-                amount: amount,
-                original_amount: amount,
-                order_type: "sell",
-                pair: "btc_jpy",
-                status: "open",
-                created_at: this.current_ts(),
 
-            })
-        } else if(order_threshold < score && (this.current_yen / this.current_rate()) > 0.01){
-            this.orders.push({
-                rate: this.current_rate(),
-                amount: amount,
-                original_amount: amount,
-                order_type: "buy",
-                pair: "btc_jpy",
-                status: "open",
-                created_at: this.current_ts(),
-            })
-        }
-    };
-
-    var applyOrder = function(trade){
-        var trader = this;
-
-        this.orders.forEach(function(order, index){
-            if(order.status != "open"){
-                return;
+        co(function* (){
+            if(score < -1 * order_threshold && self.current_btc > 0.01){
+                return yield self.api.tradeAsync(
+                    "btc_jpy",
+                    "sell",
+                    self.current_rate(),
+                    amount
+                );
+            } else if(order_threshold < score && (self.current_yen / self.current_rate()) > 0.01){
+                return yield self.api.tradeAsync(
+                    "btc_jpy",
+                    "buy",
+                    self.current_rate(),
+                    amount
+                );
             }
-
-            var order_cancel_date = new Date(order.created_at);
-            order_cancel_date.setDate(order_cancel_date.getDate() + 1);
-            var trade_date = new Date(trade.created_at);
-            if(order_cancel_date  < trade.created_at){
-                order.status = "canceled";
-                return;
-            }
-
-            if(order.order_type == "buy"){
-                if(trade.rate <= order.rate){
-                    var traded_amount = Math.min(order.amount, trade.amount);
-                    order.amount -= traded_amount;
-                    if(order.amount <= 0){
-                        order.status = "closed";
-                    }
-                    trader.current_btc += traded_amount;
-                    trader.current_yen -= traded_amount * trade.rate;
-                }
-            } else if(order.order_type == "sell"){
-                if(trade.rate >= order.rate){
-                    var traded_amount = Math.min(order.amount, trade.amount);
-                    order.amount -= traded_amount;
-                    if(order.amount <= 0){
-                        order.status = "closed";
-                    }
-                    trader.current_btc -= traded_amount;
-                    trader.current_yen += traded_amount * trade.rate;
-                }
-            }
+        }).then(function(result){
+            cb(result);
+        }).catch(function(err){
+            console.log(err);
         });
     };
+
 
     var current_assets = function(){
         return this.current_yen + this.current_btc * this.current_rate();
@@ -118,7 +89,6 @@ module.exports = (function(){
         return last_trade.created_at;
     };
 
-
     var Trader = function(entity, config, option){
         this.entity = entity;
         this.current_yen = config.jpy;
@@ -129,15 +99,14 @@ module.exports = (function(){
         this.api = option.api; // TODO coincheckのAPIとつなぐ
         this.calc_weight = option.calc_weight || 0.0001;
         this.order_threshold = option.order_threshold || 100;
-        this.order_applyed = option.order_applyed || false;
         this.order_allowed = option.order_allowed || false;
 
         this.orders = [];
         this.trades = [];
 
         this.updateTrades = updateTrades;
+        this.updateTradesAsync = updateTradesAsync;
         this.createOrder = createOrder;
-        this.applyOrder = applyOrder;
         this.current_assets = current_assets;
         this.current_rate = current_rate;
         this.current_ts = current_ts;
