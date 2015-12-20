@@ -68,6 +68,7 @@ module.exports = (function(){
 
         co(function* (){
             for(var i=0; i<self.train.length; i++){
+                trader.api._updateCurrent(self.train[i]);
                 yield trader.updateTradesAsync(self.train[i]);
             }
             console.log("finish");

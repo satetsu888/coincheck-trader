@@ -51,14 +51,14 @@ module.exports = (function(){
 
         co(function* (){
             if(score < -1 * order_threshold && self.current_btc > 0.01){
-                return yield self.api.tradeAsync(
+                return yield self.tradeAsync(
                     "btc_jpy",
                     "sell",
                     self.current_rate(),
                     amount
                 );
             } else if(order_threshold < score && (self.current_yen / self.current_rate()) > 0.01){
-                return yield self.api.tradeAsync(
+                return yield self.tradeAsync(
                     "btc_jpy",
                     "buy",
                     self.current_rate(),
@@ -72,6 +72,13 @@ module.exports = (function(){
         });
     };
 
+    var tradeAsync = function(currency_pair, action, price, amount){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            self.api.trade(currency_pair, action, price, amount, resolve);
+        });
+    };
+        
 
     var current_assets = function(){
         return this.current_yen + this.current_btc * this.current_rate();
@@ -106,6 +113,7 @@ module.exports = (function(){
 
         this.updateTrades = updateTrades;
         this.updateTradesAsync = updateTradesAsync;
+        this.tradeAsync = tradeAsync;
         this.createOrder = createOrder;
         this.current_assets = current_assets;
         this.current_rate = current_rate;

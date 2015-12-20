@@ -2,7 +2,6 @@
 module.exports = (function(){
     'use strict';
 
-
     var trade = function(currency_pair, action, price, amount, callback){
 
         var result = {
@@ -29,13 +28,6 @@ module.exports = (function(){
         setTimeout(callback, 10, result);
     };
 
-    var tradeAsync = function(currency_pair, action, price, amount){
-        var self = this;
-        return new Promise(function(resolve, reject){
-            self.trade(currency_pair, action, price, amount, resolve);
-        });
-    };
-        
     var cancelOrder = function(order_id, callback){
         var result = {};
         // TODO
@@ -51,10 +43,17 @@ module.exports = (function(){
     var _updateCurrent = function(lastTrade){
         this.current_time = lastTrade.created_at;
         this.current_rate = lastTrade.rate;
-        this._applyOrder(lastTrade);
+        if(lastTrade){
+            this._applyOrder(lastTrade);
+        }
     };
 
     var _applyOrder = function(trade){
+        var self = this;
+
+        if(!this.orders){
+            return;
+        }
 
         this.orders.forEach(function(order, index){
             if(order.status != "open"){
@@ -76,8 +75,8 @@ module.exports = (function(){
                     if(order.amount <= 0){
                         order.status = "closed";
                     }
-                    this.current_btc += traded_amount;
-                    this.current_yen -= traded_amount * trade.rate;
+                    self.current_btc += traded_amount;
+                    self.current_yen -= traded_amount * trade.rate;
                 }
             } else if(order.order_type == "sell"){
                 if(trade.rate >= order.rate){
@@ -96,7 +95,6 @@ module.exports = (function(){
 
     var api = function(){
         this.trade = trade;
-        this.tradeAsync = tradeAsync;
         this.cancelOrder = cancelOrder;
         this.activeOrders = activeOrders;
 
