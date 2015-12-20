@@ -90,12 +90,6 @@ module.exports = (function(){
         return last_trade.rate;
     };
 
-    var current_ts = function(){
-        var last_trade = this.trades[this.trades.length-1] || 0;
-
-        return last_trade.created_at;
-    };
-
     var Trader = function(entity, config, option){
         this.entity = entity;
         this.current_yen = config.jpy;
@@ -117,7 +111,6 @@ module.exports = (function(){
         this.createOrder = createOrder;
         this.current_assets = current_assets;
         this.current_rate = current_rate;
-        this.current_ts = current_ts;
     }
 
     return Trader;
