@@ -2,6 +2,7 @@ var bot = process.argv[2] || "bot1.json"
 var config = require('./config.js');
 var Trader = require('./trader.js');
 var request = require('request');
+var co = require('co');
 
 var fs = require('fs');
 var coincheck = require('node-coincheck');
@@ -26,6 +27,7 @@ var setupTraderAsync = function(res){
             calc_weight: 0.0001,
             order_threshold: 200,
             order_allowed: false,
+            api: privateApi,
         };
         trader = new Trader(entity, res, option);
         resolve();
@@ -67,12 +69,14 @@ var filterTradesAsync = function(data){
 
 var updateTradeAsync = function(trades){
     return new Promise(function(resolve, reject){
-        if(trades){
+        console.log("update " + trades.length + " Trades");
+        if(trades.length != 0){
             trades.forEach(function(trade){
-                trader.updateTrades(trade);
+                trader.updateTrades(trade, resolve);
             });
+        } else {
+            resolve(trader);
         }
-        resolve(trader);
     });
 }
 
@@ -97,10 +101,18 @@ var mainloop = function(){
     return new Promise(function(resolve, reject){
         (update(0))()
         .then(function(trader) {
-            console.log(trader.orders);
+            co(function* (){
+                var assets = yield trader.current_assetsAsync();
+                console.log(assets);
+            }).catch(function(err){
+                console.log(err);
+            });
         })
         .then(sleep)
-        .then(mainloop);
+        .then(mainloop)
+        .catch(function(err){
+            console.log(err);
+        });
     });
 };
 
@@ -109,5 +121,8 @@ getBalanceAsync()
 .then(update(100))
 .then(update(50))
 .then(allowCreateOrderAsync)
-.then(mainloop);
+.then(mainloop)
+.catch(function(err){
+    console.log(err);
+});
 
