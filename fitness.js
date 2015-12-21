@@ -12,6 +12,8 @@ module.exports = (function(){
         co(function* (){
             var trader = yield self.doFitnessAsync(entity);
             var result = yield trader.current_assetsAsync();
+            console.log(trader.current_yen);
+            console.log(trader.current_btc);
             callback(result);
         }).catch(function(err){
             console.log(err);

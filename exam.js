@@ -5,7 +5,7 @@ var Fitness = require('./fitness.js');
 var fs = require('fs');
 var co = require('co');
 
-var f = new Fitness('exam.json');
+var f = new Fitness(examdata);
 //var f = new Fitness('train_test.json');
 
 var entity = JSON.parse(fs.readFileSync(bot, 'utf8'));
