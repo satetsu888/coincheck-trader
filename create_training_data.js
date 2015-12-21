@@ -3,10 +3,10 @@ var fs = require('fs');
 var mysql      = require('mysql');
 var connection = mysql.createConnection( config.mysql );
 
-connection.query('select * from trades order by id limit 1000', function(error,results,fields){
+connection.query('select * from trades where date(created_at) > "2015-12-10" order by id limit 10000', function(error,results,fields){
     //console.log(error);
     //console.log(results);
-    fs.writeFile('train.json', JSON.stringify(results), function(){
+    fs.writeFile('train_recent.json', JSON.stringify(results), function(){
         process.exit();
     });
 });
