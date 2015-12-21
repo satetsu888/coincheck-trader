@@ -4,9 +4,11 @@ module.exports = (function(){
 
     var trade = function(currency_pair, action, price, amount, callback){
 
+        var id = Math.floor(Math.random() * 0xFFFF);
+
         var result = {
             "success": true,
-            "id": Math.floor(Math.random() * 0xFFFF),
+            "id": id,
             "rate": price,
             "amount": amount,
             "order_type": action,
@@ -15,6 +17,7 @@ module.exports = (function(){
         };
 
         var order = {
+            id: id,
             rate: price,
             amount: amount,
             original_amount: amount,

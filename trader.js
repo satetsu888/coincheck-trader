@@ -115,7 +115,6 @@ module.exports = (function(){
         this.order_threshold = option.order_threshold || 100;
         this.order_allowed = option.order_allowed || false;
 
-        this.orders = [];
         this.trades = [];
 
         this.updateTrades = updateTrades;
