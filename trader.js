@@ -66,7 +66,10 @@ module.exports = (function(){
                 );
             }
         }).then(function(result){
-            cb(result);
+            if(result){
+                console.log(result);
+            }
+            cb(self);
         }).catch(function(err){
             console.log(err);
         });

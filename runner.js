@@ -101,9 +101,11 @@ var mainloop = function(){
     return new Promise(function(resolve, reject){
         (update(0))()
         .then(function(trader) {
+            var date = new Date();
+            console.log("--" + date + "--");
             co(function* (){
                 var assets = yield trader.current_assetsAsync();
-                console.log(assets);
+                console.log("CurrentAssets: " + assets);
             }).catch(function(err){
                 console.log(err);
             });
@@ -112,6 +114,7 @@ var mainloop = function(){
         .then(mainloop)
         .catch(function(err){
             console.log(err);
+            mainloop();
         });
     });
 };
