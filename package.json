@@ -1,0 +1,29 @@
+{
+  "name": "coincheck-trader",
+  "version": "0.0.1",
+  "description": "trader for coincheck",
+  "main": "runner.js",
+  "dependencies": {
+    "co": "^4.6.0",
+    "mysql": "^2.9.0",
+    "genetic-js": "^0.1.14",
+    "node-coincheck": "^0.2.1",
+    "request": "^2.67.0",
+    "genetic": "^0.3.1",
+    "sync-request": "^2.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/satetsu888/coincheck-trader.git"
+  },
+  "author": "satetsu888",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/satetsu888/coincheck-trader/issues"
+  },
+  "homepage": "https://github.com/satetsu888/coincheck-trader#readme"
+}
