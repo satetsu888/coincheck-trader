@@ -113,7 +113,7 @@ module.exports = (function(){
 
         this.update_count = 0;
 
-        this.api = option.api; // TODO coincheckのAPIとつなぐ
+        this.api = option.api;
         this.calc_weight = option.calc_weight || 0.0001;
         this.order_threshold = option.order_threshold || 100;
         this.order_allowed = option.order_allowed || false;

@@ -121,8 +121,9 @@ var mainloop = function(){
 
 getBalanceAsync()
 .then(setupTraderAsync)
-.then(update(100))
+//.then(update(100))
 .then(update(50))
+.then(update(0))
 .then(allowCreateOrderAsync)
 .then(mainloop)
 .catch(function(err){
