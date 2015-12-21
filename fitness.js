@@ -10,9 +10,11 @@ module.exports = (function(){
     var calcAssets = function(entity, callback){
         var self = this;
         co(function* (){
-            return yield self.doFitnessAsync(entity);
-        }).then(function(trader){
-            callback(trader.current_assets());
+            var trader = yield self.doFitnessAsync(entity);
+            var result = yield trader.current_assetsAsync();
+            callback(result);
+        }).catch(function(err){
+            console.log(err);
         });
     };
 
@@ -23,28 +25,6 @@ module.exports = (function(){
         });
     };
 
-    var printStats = function(entity, callback){
-        console.log(JSON.stringify(entity));
-
-        var trader = this.doFitness(entity);
-
-        var buy = 0;
-        var sell = 0;
-        trader.orders.forEach(function(e){
-            if(e.order_type == 'buy'){
-                buy++;
-            } else {
-                sell++;
-            }
-        });
-        console.log("order_num: " + trader.orders.length);
-        console.log("order: sell: " + sell + " buy: " + buy);
-        console.log("current_yen: " + trader.current_yen);
-        console.log("current_btc:" + trader.current_btc);
-        console.log("current_rate: " + trader.current_rate());
-        console.log("current_assets: " + trader.current_assets());
-    };
-
     var doFitness = function(entity, callback){
         var self = this;
         var seriarized_entity = self.seriarize(entity);
@@ -52,6 +32,7 @@ module.exports = (function(){
             callback(self.cache[seriarized_entity]);
         }
 
+        var api = require(base_dir + '/api_mock.js');
         var Trader = require(base_dir + '/trader.js');
         var config = {
             jpy: 50000,
@@ -61,7 +42,7 @@ module.exports = (function(){
             calc_weight: 0.0001,
             order_threshold: 200,
             order_allowed: true,
-            api: self.api,
+            api: new api(config),
         };
 
         var trader = new Trader(entity, config, option);
@@ -69,6 +50,7 @@ module.exports = (function(){
         co(function* (){
             for(var i=0; i<self.train.length; i++){
                 trader.api._updateCurrent(self.train[i]);
+                trader.current_assetsAsync();
                 yield trader.updateTradesAsync(self.train[i]);
             }
             console.log("finish");
@@ -89,15 +71,12 @@ module.exports = (function(){
     var seriarize = function(entity){
        return JSON.stringify(entity);
     };
-    var api = require(base_dir + '/api_mock.js');
 
     var Fitness = function(file){
         this.train = JSON.parse(fs.readFileSync(file, 'utf8'));
-        this.api = new api(),
         this.cache = {};
         this.calcAssets = calcAssets;
         this.calcAssetsAsync = calcAssetsAsync;
-        this.printStats = printStats;
         this.doFitness = doFitness;
         this.doFitnessAsync = doFitnessAsync;
         this.seriarize = seriarize;

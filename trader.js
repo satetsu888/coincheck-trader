@@ -80,8 +80,21 @@ module.exports = (function(){
     };
         
 
-    var current_assets = function(){
-        return this.current_yen + this.current_btc * this.current_rate();
+    var current_assets = function(callback){
+        var self = this;
+        var balance = self.api.getBalance(function(balance){
+            var assets = balance.jpy + balance.btc * self.current_rate();
+            self.current_yen = balance.jpy;
+            self.current_btc = balance.btc;
+            callback(assets);
+        });
+    };
+
+    var current_assetsAsync = function(){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            self.current_assets(resolve);
+        });
     };
 
     var current_rate = function(){
@@ -110,6 +123,7 @@ module.exports = (function(){
         this.tradeAsync = tradeAsync;
         this.createOrder = createOrder;
         this.current_assets = current_assets;
+        this.current_assetsAsync = current_assetsAsync;
         this.current_rate = current_rate;
     }
 

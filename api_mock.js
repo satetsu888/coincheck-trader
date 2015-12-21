@@ -25,19 +25,39 @@ module.exports = (function(){
         };
         this.orders.push(order);
 
-        setTimeout(callback, 10, result);
+        setTimeout(callback, 1, result);
     };
 
     var cancelOrder = function(order_id, callback){
         var result = {};
         // TODO
-        setTimeout(callback, 10, result);
+        setTimeout(callback, 1, result);
     };
 
     var activeOrders = function(callback){
         var result = this.activeOrders;
         // TODO
-        setTimeout(callback, 10, result);
+        setTimeout(callback, 1, result);
+    };
+
+    var getBalance = function(callback){
+        var self = this;
+
+        var balance = {
+            "success": true,
+            "jpy": self.current_yen,
+            "btc": self.current_btc,
+            "jpy_reserved": "0", // 未決済注文から計算する
+            "btc_reserved": "0", // 同上
+            "jpy_lend_in_use": "0",
+            "btc_lend_in_use": "0",
+            "jpy_lent": "0",
+            "btc_lent": "0",
+            "jpy_debt": "0",
+            "btc_debt": "0"
+        };
+
+        setTimeout(callback, 1, balance);
     };
 
     var _updateCurrent = function(lastTrade){
@@ -85,24 +105,25 @@ module.exports = (function(){
                     if(order.amount <= 0){
                         order.status = "closed";
                     }
-                    this.current_btc -= traded_amount;
-                    this.current_yen += traded_amount * trade.rate;
+                    self.current_btc -= traded_amount;
+                    self.current_yen += traded_amount * trade.rate;
                 }
             }
         });
     };
 
 
-    var api = function(){
+    var api = function(config){
         this.trade = trade;
         this.cancelOrder = cancelOrder;
         this.activeOrders = activeOrders;
+        this.getBalance = getBalance;
 
         this._updateCurrent = _updateCurrent;
         this._applyOrder = _applyOrder;
 
-        this.current_yen;
-        this.current_btc;
+        this.current_yen = config.jpy;
+        this.current_btc = config.btc;
         this.current_time;
         this.current_rate;
         this.orders = [];
