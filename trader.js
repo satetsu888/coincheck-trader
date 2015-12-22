@@ -66,10 +66,12 @@ module.exports = (function(){
                 );
             }
         }).then(function(result){
-            if(result){
-                //console.log(result);
+            if(result && self.verbose){
+                console.log(result);
             }
-            //console.log("current score: " + score);
+            if(self.verbose){
+                console.log("current score: " + score);
+            }
             cb(self);
         }).catch(function(err){
             console.log(err);
@@ -118,6 +120,7 @@ module.exports = (function(){
         this.calc_weight = option.calc_weight || 0.0001;
         this.order_threshold = option.order_threshold || 100;
         this.order_allowed = option.order_allowed || false;
+        this.verbose = option.verbose || false;
 
         this.trades = [];
 
