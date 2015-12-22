@@ -2,6 +2,8 @@ module.exports = (function(){
     'use strict';
 
     var co = require('co');
+    var coincheck = require('node-coincheck');
+    var publicApi = coincheck.PublicApi;
 
     var updateTrades = function(trade, cb){
         var self = this;
@@ -50,18 +52,20 @@ module.exports = (function(){
         var amount = Math.floor(Math.abs(0.0001 * score * entity[101]) * 10000) / 10000;
 
         co(function* (){
+            var ticker = yield publicApi.ticker;
+
             if(score < -1 * order_threshold && self.current_btc > 0.01){
                 return yield self.tradeAsync(
                     "btc_jpy",
                     "sell",
-                    self.current_rate(),
+                    Math.min(self.current_rate(), ticker.bid),
                     amount
                 );
             } else if(order_threshold < score && (self.current_yen / self.current_rate()) > 0.01){
                 return yield self.tradeAsync(
                     "btc_jpy",
                     "buy",
-                    self.current_rate(),
+                    Math.max(self.current_rate(), ticker.ask),
                     amount
                 );
             }
