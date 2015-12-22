@@ -52,7 +52,9 @@ module.exports = (function(){
         var amount = Math.floor(Math.abs(0.0001 * score * entity[101]) * 10000) / 10000;
 
         co(function* (){
-            var ticker = yield publicApi.ticker;
+            var ticker = yield new Promise(function(resolve, reject){
+                publicApi.ticker(resolve);
+            });
 
             if(score < -1 * order_threshold && self.current_btc > 0.01){
                 return yield self.tradeAsync(
