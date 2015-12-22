@@ -69,6 +69,7 @@ module.exports = (function(){
             if(result){
                 console.log(result);
             }
+            console.log("current score: " + score);
             cb(self);
         }).catch(function(err){
             console.log(err);
@@ -86,7 +87,7 @@ module.exports = (function(){
     var current_assets = function(callback){
         var self = this;
         var balance = self.api.getBalance(function(balance){
-            var assets = balance.jpy + balance.btc * self.current_rate();
+            var assets = parseFloat(balance.jpy) + parseFloat(balance.btc * self.current_rate());
             self.current_yen = balance.jpy;
             self.current_btc = balance.btc;
             callback(assets);
