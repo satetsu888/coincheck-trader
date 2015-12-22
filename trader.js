@@ -53,8 +53,11 @@ module.exports = (function(){
 
         co(function* (){
             var ticker = yield new Promise(function(resolve, reject){
-                publicApi.ticker(resolve);
+                publicApi.ticker(function(result){
+                    resolve(result);
+                });
             });
+            console.log("tick: " + JSON.stringify(ticker));
 
             if(score < -1 * order_threshold && self.current_btc > 0.01){
                 return yield self.tradeAsync(
