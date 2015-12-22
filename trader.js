@@ -63,14 +63,14 @@ module.exports = (function(){
                 return yield self.tradeAsync(
                     "btc_jpy",
                     "sell",
-                    Math.min(self.current_rate(), ticker.bid),
+                    Math.max(self.current_rate(), ticker.ask),
                     amount
                 );
             } else if(order_threshold < score && (self.current_yen / self.current_rate()) > 0.01){
                 return yield self.tradeAsync(
                     "btc_jpy",
                     "buy",
-                    Math.max(self.current_rate(), ticker.ask),
+                    Math.min(self.current_rate(), ticker.bid),
                     amount
                 );
             }
