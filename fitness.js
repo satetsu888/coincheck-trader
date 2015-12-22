@@ -12,8 +12,8 @@ module.exports = (function(){
         co(function* (){
             var trader = yield self.doFitnessAsync(entity);
             var result = yield trader.current_assetsAsync();
-            console.log(trader.current_yen);
-            console.log(trader.current_btc);
+            //console.log(trader.current_yen);
+            //console.log(trader.current_btc);
             callback(result);
         }).catch(function(err){
             console.log(err);
@@ -41,7 +41,7 @@ module.exports = (function(){
             btc: 0,
         };
         var option = {
-            calc_weight: 0.0001,
+            calc_weight: 0.0002,
             order_threshold: 200,
             order_allowed: true,
             api: new api(config),
@@ -55,7 +55,7 @@ module.exports = (function(){
                 trader.current_assetsAsync();
                 yield trader.updateTradesAsync(self.train[i]);
             }
-            console.log("finish");
+            //console.log("finish");
             self.cache[seriarized_entity] = trader;
             callback(self.cache[seriarized_entity]);    
         }).catch(function(err){

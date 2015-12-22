@@ -67,9 +67,9 @@ module.exports = (function(){
             }
         }).then(function(result){
             if(result){
-                console.log(result);
+                //console.log(result);
             }
-            console.log("current score: " + score);
+            //console.log("current score: " + score);
             cb(self);
         }).catch(function(err){
             console.log(err);
