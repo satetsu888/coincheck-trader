@@ -49,7 +49,7 @@ module.exports = (function(){
         });
         score += 10 * entity[100] * (self.current_yen / self.current_rate() - self.current_btc);
 
-        var amount = Math.floor(Math.abs(0.0001 * score * entity[101]) * 10000) / 10000;
+        var amount = Math.floor(Math.abs(self.order_weight * score * entity[101]) * 10000) / 10000;
 
         co(function* (){
             var ticker = yield new Promise(function(resolve, reject){
@@ -57,7 +57,9 @@ module.exports = (function(){
                     resolve(result);
                 });
             });
-            console.log("tick: " + JSON.stringify(ticker));
+            if(self.verbose){
+                console.log("tick: " + JSON.stringify(ticker));
+            }
 
             if(score < -1 * order_threshold && self.current_btc > 0.01){
                 return yield self.tradeAsync(
@@ -127,6 +129,7 @@ module.exports = (function(){
 
         this.api = option.api;
         this.calc_weight = option.calc_weight || 0.0001;
+        this.order_weight = option.order_weight || 0.0001;
         this.order_threshold = option.order_threshold || 100;
         this.order_allowed = option.order_allowed || false;
         this.verbose = option.verbose || false;

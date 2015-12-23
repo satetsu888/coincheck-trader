@@ -41,9 +41,10 @@ module.exports = (function(){
             btc: 0,
         };
         var option = {
-            calc_weight: 0.0002,
+            calc_weight: 0.0001,
             order_threshold: 200,
             order_allowed: true,
+            order_weight: 0.001,
             api: new api(config),
         };
 
