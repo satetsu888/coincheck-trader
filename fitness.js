@@ -44,7 +44,7 @@ module.exports = (function(){
             calc_weight: 0.0001,
             order_threshold: 200,
             order_allowed: true,
-            order_weight: 0.001,
+            order_weight: 0.0002,
             api: new api(config),
         };
 

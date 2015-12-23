@@ -7,7 +7,7 @@ var Fitness = require(base_dir + '/fitness.js');
 var userData = {
     tradesLength: 102,
     orderSize: 1,
-    fitness: new Fitness('train_recent.json'),
+    fitness: new Fitness('train.json'),
 };
 
 function getRandomSolution(callback) {
@@ -72,7 +72,7 @@ function crossover(father, mother, callback){
 function stopCriteria() {
     console.log("generation: " + this.generation);
     console.log("stat: " + JSON.stringify(this.statistics));
-      return (this.generation == 10);
+      return (this.generation == 5);
 }
 
 

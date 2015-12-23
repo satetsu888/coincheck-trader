@@ -52,27 +52,38 @@ module.exports = (function(){
         var amount = Math.floor(Math.abs(self.order_weight * score * entity[101]) * 10000) / 10000;
 
         co(function* (){
-            var ticker = yield new Promise(function(resolve, reject){
-                publicApi.ticker(function(result){
-                    resolve(result);
+            var ticker;
+            if(self.use_tick){
+                ticker = yield new Promise(function(resolve, reject){
+                    publicApi.ticker(function(result){
+                        resolve(result);
+                    });
                 });
-            });
+            }
             if(self.verbose){
                 console.log("tick: " + JSON.stringify(ticker));
             }
 
             if(score < -1 * order_threshold && self.current_btc > 0.01){
+                var rate = self.current_rate();
+                if(self.use_tick){
+                   rate = Math.max(self.current_rate(), ticker.ask);
+                }
                 return yield self.tradeAsync(
                     "btc_jpy",
                     "sell",
-                    Math.max(self.current_rate(), ticker.ask),
+                    rate,
                     amount
                 );
             } else if(order_threshold < score && (self.current_yen / self.current_rate()) > 0.01){
+                var rate = self.current_rate();
+                if(self.use_tick){
+                   rate = Math.min(self.current_rate(), ticker.bid);
+                }
                 return yield self.tradeAsync(
                     "btc_jpy",
                     "buy",
-                    Math.min(self.current_rate(), ticker.bid),
+                    rate,
                     amount
                 );
             }
@@ -133,6 +144,7 @@ module.exports = (function(){
         this.order_threshold = option.order_threshold || 100;
         this.order_allowed = option.order_allowed || false;
         this.verbose = option.verbose || false;
+        this.use_tick = option.use_tick || false;
 
         this.trades = [];
 
@@ -143,6 +155,8 @@ module.exports = (function(){
         this.current_assets = current_assets;
         this.current_assetsAsync = current_assetsAsync;
         this.current_rate = current_rate;
+
+        console.log(option);
     }
 
     return Trader;

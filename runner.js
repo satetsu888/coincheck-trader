@@ -27,8 +27,10 @@ var setupTraderAsync = function(res){
             calc_weight: 0.0001,
             order_threshold: 200,
             order_allowed: false,
+            order_weight: 0.0002,
             api: privateApi,
             verbose: true,
+            use_tick: true,
         };
         trader = new Trader(entity, res, option);
         resolve();
