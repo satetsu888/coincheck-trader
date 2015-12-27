@@ -46,12 +46,9 @@ var allowCreateOrderAsync = function(){
 
 var fetchTradesAsync = function(offset){
     return new Promise(function(resolve, reject){
-        request.get(
-            {url: 'https://coincheck.jp/api/trades?offset=' + offset, json: true},
-            function(error, response, body){
-                resolve(body.reverse());
-            }
-        );
+        publicApi.trades(offset, function(body){
+            resolve(body.reverse());
+        });
     });
 };
 
