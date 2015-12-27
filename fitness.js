@@ -7,23 +7,31 @@ module.exports = (function(){
 
     global.base_dir = __dirname;
 
-    var calcAssets = function(entity, callback){
+    var calcScore = function(entity, callback){
         var self = this;
         co(function* (){
             var trader = yield self.doFitnessAsync(entity);
-            var result = yield trader.current_assetsAsync();
+            var asset = yield trader.current_assetsAsync();
+
+            //console.log(asset);
+            //console.log(trader.max_draw_down);
+            return (parseFloat(asset - 50000) - parseFloat(trader.max_draw_down));
+            //console.log(fitness);
             //console.log(trader.current_yen);
             //console.log(trader.current_btc);
-            callback(result);
+            //callback(fitness);
+        }).then(function(score){
+            console.log(score);
+            callback(score);
         }).catch(function(err){
             console.log(err);
         });
     };
 
-    var calcAssetsAsync = function(entity){
+    var calcScoreAsync = function(entity){
         var self = this;
         return new Promise(function(resolve, reject){
-            self.calcAssets(entity, resolve);
+            self.calcScore(entity, resolve);
         });
     };
 
@@ -78,8 +86,8 @@ module.exports = (function(){
     var Fitness = function(file){
         this.train = JSON.parse(fs.readFileSync(file, 'utf8'));
         this.cache = {};
-        this.calcAssets = calcAssets;
-        this.calcAssetsAsync = calcAssetsAsync;
+        this.calcScore = calcScore;
+        this.calcScoreAsync = calcScoreAsync;
         this.doFitness = doFitness;
         this.doFitnessAsync = doFitnessAsync;
         this.seriarize = seriarize;

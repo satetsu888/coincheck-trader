@@ -7,7 +7,7 @@ var Fitness = require(base_dir + '/fitness.js');
 var userData = {
     tradesLength: 102,
     orderSize: 1,
-    fitness: new Fitness('train.json'),
+    fitness: new Fitness('train_recent.json'),
 };
 
 function getRandomSolution(callback) {
@@ -29,9 +29,10 @@ function getRandomSolution(callback) {
 function fitness(solution, callback) {
     co(function* (){
         //console.log(solution);
-        var result = yield userData.fitness.calcAssetsAsync(solution);
+        return yield userData.fitness.calcScoreAsync(solution);
         //console.log(result);
-        callback(result - 50000);
+    }).then(function(result){
+        callback(result);
     }).catch(function(err){
         console.log(err);
     });
@@ -72,7 +73,7 @@ function crossover(father, mother, callback){
 function stopCriteria() {
     console.log("generation: " + this.generation);
     console.log("stat: " + JSON.stringify(this.statistics));
-      return (this.generation == 5);
+      return (this.generation == 6);
 }
 
 

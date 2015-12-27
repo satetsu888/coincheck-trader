@@ -114,6 +114,13 @@ module.exports = (function(){
             var assets = parseFloat(balance.jpy) + parseFloat(balance.btc * self.current_rate());
             self.current_yen = balance.jpy;
             self.current_btc = balance.btc;
+            if(self.max_asset < assets){
+                self.max_asset = assets;
+            }
+            var draw_down =  self.max_asset - assets;
+            if(self.max_draw_down < draw_down){
+                self.max_draw_down = draw_down;
+            }
             callback(assets);
         });
     };
@@ -135,6 +142,8 @@ module.exports = (function(){
         this.entity = entity;
         this.current_yen = config.jpy;
         this.current_btc = config.btc;
+        this.max_asset = 0;
+        this.max_draw_down = 0;
 
         this.update_count = 0;
 
