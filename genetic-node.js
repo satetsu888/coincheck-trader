@@ -72,8 +72,8 @@ function crossover(father, mother, callback){
 
 function stopCriteria() {
     console.log("generation: " + this.generation);
-    console.log("stat: " + JSON.stringify(this.statistics));
-      return (this.generation == 6);
+    //console.log("stat: " + JSON.stringify(this.statistics));
+    return (this.generation == 6);
 }
 
 
@@ -95,4 +95,7 @@ var Task = require('genetic').Task
 taskInstance.run(function (stats) {
     console.log('results');
     console.log(stats);
+});
+taskInstance.on("error", function(error){
+    console.log(error);
 });
