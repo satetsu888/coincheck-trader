@@ -72,7 +72,7 @@ function crossover(father, mother, callback){
 
 function stopCriteria() {
     console.log("generation: " + this.generation);
-    //console.log("stat: " + JSON.stringify(this.statistics));
+    console.log("stat: " + JSON.stringify(this.statistics));
     return (this.generation == 6);
 }
 
