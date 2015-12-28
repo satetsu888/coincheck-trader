@@ -22,7 +22,11 @@ module.exports = (function(){
             //callback(fitness);
         }).then(function(score){
             console.log(score);
-            callback(score);
+            if(score > 0){
+                callback(score);
+            } else {
+                callback(0)
+            }
         }).catch(function(err){
             console.log(err);
         });
