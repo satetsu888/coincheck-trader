@@ -8,7 +8,7 @@ module.exports = (function(){
     var updateTrades = function(trade, cb){
         var self = this;
         self.trades.push(trade);
-        self.update_count++;
+        self.stats.update_trade_count++;
         if(self.trades.length > 100){
             self.trades.shift();
             if(self.order_allowed){
@@ -69,6 +69,7 @@ module.exports = (function(){
                 if(self.use_tick){
                    rate = Math.max(self.current_rate(), ticker.ask);
                 }
+                self.stats.order.sell++;
                 return yield self.tradeAsync(
                     "btc_jpy",
                     "sell",
@@ -80,6 +81,7 @@ module.exports = (function(){
                 if(self.use_tick){
                    rate = Math.min(self.current_rate(), ticker.bid);
                 }
+                self.stats.order.buy++;
                 return yield self.tradeAsync(
                     "btc_jpy",
                     "buy",
@@ -146,9 +148,12 @@ module.exports = (function(){
         this.stats = {
             max_asset: 0,
             max_draw_down: 0,
+            order: {
+                buy: 0,
+                sell: 0,
+            },
+            update_trade_count: 0,
         };
-
-        this.update_count = 0;
 
         this.api = option.api;
         this.calc_weight = option.calc_weight || 0.0001;
