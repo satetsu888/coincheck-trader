@@ -7,7 +7,7 @@ var Fitness = require(base_dir + '/fitness.js');
 var userData = {
     tradesLength: 102,
     orderSize: 1,
-    fitness: new Fitness('train_recent.json'),
+    fitness: new Fitness('train_test.json'),
 };
 
 function getRandomSolution(callback) {
@@ -28,11 +28,14 @@ function getRandomSolution(callback) {
 
 function fitness(solution, callback) {
     co(function* (){
-        //console.log(solution);
         return yield userData.fitness.calcScoreAsync(solution);
-        //console.log(result);
     }).then(function(result){
-        callback(result);
+        console.log(result);
+        if(result.score > 0){
+            callback(result.score);
+        } else {
+            callback(0)
+        }
     }).catch(function(err){
         console.log(err);
     });

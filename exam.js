@@ -12,9 +12,9 @@ var entity = JSON.parse(fs.readFileSync(bot, 'utf8'));
 
 
 co(function* (){
-    var assets = yield f.calcAssetsAsync(entity);
-    console.log(assets);
+    var result = yield f.calcScoreAsync(entity);
+    console.log(result);
 }).catch(function(err){
-    throw err;
+    console.log(err.stack);
 });
 

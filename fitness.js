@@ -13,20 +13,12 @@ module.exports = (function(){
             var trader = yield self.doFitnessAsync(entity);
             var asset = yield trader.current_assetsAsync();
 
-            //console.log(asset);
-            //console.log(trader.max_draw_down);
-            return (parseFloat(asset - 50000) - parseFloat(trader.max_draw_down));
-            //console.log(fitness);
-            //console.log(trader.current_yen);
-            //console.log(trader.current_btc);
-            //callback(fitness);
-        }).then(function(score){
-            console.log(score);
-            if(score > 0){
-                callback(score);
-            } else {
-                callback(0)
-            }
+            return {
+                score : parseFloat(asset - 50000) - parseFloat(trader.stats.max_draw_down),
+                stats : trader.stats,
+            };
+        }).then(function(result){
+            callback(result);
         }).catch(function(err){
             console.log(err);
         });
