@@ -7,7 +7,7 @@
     "co": "^4.6.0",
     "mysql": "^2.9.0",
     "genetic-js": "^0.1.14",
-    "node-coincheck": "git://github.com/satetsu888/node-coincheck.git#add_some_api",
+    "node-coincheck": "git://github.com/satetsu888/node-coincheck.git#master",
     "request": "^2.67.0",
     "genetic": "^0.3.1",
     "sync-request": "^2.1.0"
