@@ -1,5 +1,6 @@
 var fs = require('fs');
 var co = require('co');
+var md5 = require('md5');
 
 module.exports = (function(){
     'use strict';
@@ -39,10 +40,15 @@ module.exports = (function(){
         }
 
         var api = require(base_dir + '/api_mock.js');
+        var logger = require(base_dir + '/logger.js');
         var Trader = require(base_dir + '/trader.js');
         var config = {
             jpy: 50000,
             btc: 0,
+        };
+        var myLogger;
+        if(self.logging){
+            myLogger = new logger(self.seriarize(entity) + '_' + self.file );
         };
         var option = {
             calc_weight: 0.0001,
@@ -50,6 +56,7 @@ module.exports = (function(){
             order_allowed: true,
             order_weight: 0.0002,
             api: new api(config),
+            logger: myLogger,
         };
 
         var trader = new Trader(entity, config, option);
@@ -76,10 +83,13 @@ module.exports = (function(){
     };
 
     var seriarize = function(entity){
-       return JSON.stringify(entity);
+       var str = JSON.stringify(entity);
+       return md5(str);
     };
 
     var Fitness = function(file){
+        this.file = file;
+        this.logging = false;
         this.train = JSON.parse(fs.readFileSync(file, 'utf8'));
         this.cache = {};
         this.calcScore = calcScore;
