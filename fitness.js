@@ -40,7 +40,7 @@ module.exports = (function(){
         }
 
         var api = require(base_dir + '/api_mock.js');
-        var logger = require(base_dir + '/logger.js');
+        var logger = require(base_dir + '/spreadsheet_logger.js');
         var Trader = require(base_dir + '/trader.js');
         var config = {
             jpy: 50000,
