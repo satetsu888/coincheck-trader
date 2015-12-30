@@ -107,13 +107,14 @@ var mainloop = function(){
                 var assets = yield trader.current_assetsAsync();
                 console.log("CurrentAssets: " + assets);
             }).catch(function(err){
-                console.log(err);
+                console.log(err.stack);
+                throw err;
             });
         })
         .then(sleep)
         .then(mainloop)
         .catch(function(err){
-            console.log(err);
+            console.log(err.stack);
             mainloop();
         });
     });
@@ -127,6 +128,6 @@ getBalanceAsync()
 .then(allowCreateOrderAsync)
 .then(mainloop)
 .catch(function(err){
-    console.log(err);
+    console.log(err.stack);
 });
 
