@@ -63,8 +63,12 @@ module.exports = (function(){
             var ticker;
             if(self.use_tick){
                 ticker = yield new Promise(function(resolve, reject){
-                    publicApi.ticker(function(result){
-                        resolve(result);
+                    publicApi.ticker(function(err, result){
+                        if(err){
+                            reject(err);
+                        } else {
+                            resolve(result);
+                        }
                     });
                 });
             }
@@ -113,14 +117,20 @@ module.exports = (function(){
     var tradeAsync = function(currency_pair, action, price, amount){
         var self = this;
         return new Promise(function(resolve, reject){
-            self.api.trade(currency_pair, action, price, amount, resolve);
+            self.api.trade(currency_pair, action, price, amount, function(err, result){
+                if(err){
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            });
         });
     };
         
 
     var current_assets = function(callback){
         var self = this;
-        var balance = self.api.getBalance(function(balance){
+        var balance = self.api.getBalance(function(err, balance){
             var assets = parseFloat(balance.jpy) + parseFloat(balance.btc * self.current_rate());
             self.current_yen = balance.jpy;
             self.current_btc = balance.btc;

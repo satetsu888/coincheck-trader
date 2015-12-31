@@ -14,8 +14,12 @@ var lastId;
 
 var getBalanceAsync = function(res){
     return new Promise(function(resolve, reject){
-        privateApi.getBalance(function(body){
-            resolve(body);
+        privateApi.getBalance(function(err, body){
+            if(err){
+                reject(err);
+            } else {
+                resolve(body);
+            }
         });
     });
 };
@@ -46,8 +50,12 @@ var allowCreateOrderAsync = function(){
 
 var fetchTradesAsync = function(offset){
     return new Promise(function(resolve, reject){
-        publicApi.trades(offset, function(body){
-            resolve(body.reverse());
+        publicApi.trades(offset, function(err, body){
+            if(err){
+                reject(err);
+            } else { 
+                resolve(body.reverse());
+            }
         });
     });
 };

@@ -29,19 +29,19 @@ module.exports = (function(){
         //console.log(order);
         this.orders.push(order);
 
-        setTimeout(callback, 1, result);
+        setTimeout(callback, 1, null, result);
     };
 
     var cancelOrder = function(order_id, callback){
         var result = {};
         // TODO
-        setTimeout(callback, 1, result);
+        setTimeout(callback, 1, null, result);
     };
 
     var activeOrders = function(callback){
         var result = this.activeOrders;
         // TODO
-        setTimeout(callback, 1, result);
+        setTimeout(callback, 1, null, result);
     };
 
     var getBalance = function(callback){
@@ -61,7 +61,7 @@ module.exports = (function(){
             "btc_debt": "0"
         };
 
-        setTimeout(callback, 1, balance);
+        setTimeout(callback, 1, null, balance);
     };
 
     var _updateCurrent = function(lastTrade){
