@@ -189,7 +189,7 @@ module.exports = (function(){
         this.current_rate = current_rate;
         this.last_trade = last_trade;
 
-        console.log(option);
+        //console.log(option);
     }
 
     return Trader;

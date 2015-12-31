@@ -26,7 +26,7 @@ module.exports = (function(){
             status: "open",
             created_at: this.current_time,
         };
-        console.log(order);
+        //console.log(order);
         this.orders.push(order);
 
         setTimeout(callback, 1, result);
