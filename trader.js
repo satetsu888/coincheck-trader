@@ -15,17 +15,21 @@ module.exports = (function(){
                 self.createOrder(self.trades, cb);
             } else {
                 console.log("order not allowed");
-                cb(self);
+                cb(null, self);
             }
         } else {
-            cb(self);
+            cb(null, self);
         }
     };
 
     var updateTradesAsync = function(trade){
         var self = this;
         return new Promise(function(resolve, reject){
-            self.updateTrades(trade, function(trader){
+            self.updateTrades(trade, function(err, trader){
+                if(err){
+                    reject(err);
+                }
+
                 if(self.logger){
                     self.logger.log(trader, function(){
                         resolve(trader);
@@ -108,9 +112,10 @@ module.exports = (function(){
             if(self.verbose){
                 console.log("current score: " + self.current_score);
             }
-            cb(self);
+            cb(null, self);
         }).catch(function(err){
             console.log(err);
+            cb(err, null)
         });
     };
 

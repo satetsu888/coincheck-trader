@@ -80,7 +80,12 @@ var updateTradeAsync = function(trades){
         console.log("update " + trades.length + " Trades");
         if(trades.length != 0){
             trades.forEach(function(trade){
-                trader.updateTrades(trade, resolve);
+                trader.updateTrades(trade, function(err, trader){
+                    if(err){
+                        reject(err);
+                    }
+                    resolve(trader);
+                });
             });
         } else {
             resolve(trader);
