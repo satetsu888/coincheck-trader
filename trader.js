@@ -149,7 +149,13 @@ module.exports = (function(){
     var current_assetsAsync = function(){
         var self = this;
         return new Promise(function(resolve, reject){
-            self.current_assets(resolve);
+            self.current_assets(function(err, result){
+                if(err){
+                    reject(err);
+                } else {
+                    resolve(result);
+                }
+            })
         });
     };
 
