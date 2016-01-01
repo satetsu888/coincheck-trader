@@ -115,7 +115,7 @@ module.exports = (function(){
             cb(null, self);
         }).catch(function(err){
             console.log(err);
-            cb(err, null)
+            cb(err, null);
         });
     };
 
