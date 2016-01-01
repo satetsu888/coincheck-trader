@@ -100,6 +100,9 @@ var update = function(offset){
             .then(filterTradesAsync)
             .then(updateTradeAsync)
             .then(resolve);
+        }).catch(function(e){
+            console.log(e);
+            reject(e);
         });
     }
 };
