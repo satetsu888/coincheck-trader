@@ -131,6 +131,9 @@ module.exports = (function(){
     var current_assets = function(callback){
         var self = this;
         var balance = self.api.getBalance(function(err, balance){
+            if(err){
+                callback(err, null);
+            }
             var assets = parseFloat(balance.jpy) + parseFloat(balance.btc * self.current_rate());
             self.current_yen = balance.jpy;
             self.current_btc = balance.btc;
@@ -142,7 +145,7 @@ module.exports = (function(){
             if(self.stats.max_draw_down < draw_down){
                 self.stats.max_draw_down = draw_down;
             }
-            callback(assets);
+            callback(null, assets);
         });
     };
 
