@@ -81,7 +81,7 @@ var updateTradeAsync = function(trades){
         if(trades.length != 0){
             co(function* (){
                 for(var i=0;i<trades.length;i++){
-                    yield trader.updateTradesAsync(trades[i]);
+                    yield trader.updateAsync(trades[i]);
                 }
                 resolve(trader);
             }).catch(function(err){

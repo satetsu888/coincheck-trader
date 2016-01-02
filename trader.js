@@ -5,6 +5,19 @@ module.exports = (function(){
     var coincheck = require('node-coincheck');
     var publicApi = coincheck.PublicApi;
 
+    var updateLogAsync = function(trader){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            if(self.logger){
+                self.logger.log(trader, function(){
+                    resolve(trader);
+                });
+            } else {
+                resolve(trader);
+            }
+        });
+    };
+
     var updateTrades = function(trade, cb){
         var self = this;
         self.trades.push(trade);
@@ -28,12 +41,6 @@ module.exports = (function(){
             self.updateTrades(trade, function(err, trader){
                 if(err){
                     reject(err);
-                }
-
-                if(self.logger){
-                    self.logger.log(trader, function(){
-                        resolve(trader);
-                    });
                 } else {
                     resolve(trader);
                 }
@@ -41,12 +48,23 @@ module.exports = (function(){
         });
     };
 
-    var createOrder = function(trades, cb){
+    var updateAsync = function(trade){
         var self = this;
-        var entity = self.entity;
-        var calc_weight = self.calc_weight;
-        var order_threshold = self.order_threshold;
-        self.current_score = 0;
+        return new Promise(function(resolve, reject){
+            co(function* (){
+                yield self.updateTradesAsync(trade);
+                yield self.updateLogAsync(self);
+                resolve(self);
+            }).catch(function(err){
+                console.log(err);
+                reject(err);
+            });
+        });
+    };
+
+    var calcScore = function(trades, option){
+        var self = this;
+        var score = 0;
 
         var sign;
         trades.forEach(function(element, index){
@@ -56,12 +74,19 @@ module.exports = (function(){
                 sign = -1;
             }
 
-            var delta = sign * element.amount * element.rate * entity[index] * calc_weight;
-            self.current_score += delta;
+            var delta = sign * element.amount * element.rate * self.entity[index] * self.calc_weight;
+            score += delta;
         });
-        self.current_score += 10 * entity[100] * (self.current_yen / self.current_rate() - self.current_btc);
+        score += 10 * self.entity[100] * (self.current_yen / self.current_rate() - self.current_btc);
 
-        var amount = Math.floor(Math.abs(self.order_weight * self.current_score * entity[101]) * 10000) / 10000;
+        return score;
+    };
+
+    var createOrder = function(trades, cb){
+        var self = this;
+        self.current_score = self.calcScore(trades, {});
+
+        var amount = Math.floor(Math.abs(self.order_weight * self.current_score * self.entity[101]) * 10000) / 10000;
 
         co(function* (){
             var ticker;
@@ -80,7 +105,7 @@ module.exports = (function(){
                 console.log("tick: " + JSON.stringify(ticker));
             }
 
-            if(self.current_score < -1 * order_threshold && self.current_btc > 0.01){
+            if(self.current_score < -1 * self.order_threshold && self.current_btc > 0.01){
                 var rate = self.current_rate();
                 if(self.use_tick){
                    rate = Math.max(self.current_rate(), ticker.ask);
@@ -92,7 +117,7 @@ module.exports = (function(){
                     rate,
                     amount
                 );
-            } else if(order_threshold < self.current_score && (self.current_yen / self.current_rate()) > 0.01){
+            } else if(self.order_threshold < self.current_score && (self.current_yen / self.current_rate()) > 0.01){
                 var rate = self.current_rate();
                 if(self.use_tick){
                    rate = Math.min(self.current_rate(), ticker.bid);
@@ -205,9 +230,12 @@ module.exports = (function(){
 
         this.trades = [];
 
+        this.updateLogAsync = updateLogAsync;
         this.updateTrades = updateTrades;
         this.updateTradesAsync = updateTradesAsync;
+        this.updateAsync = updateAsync;
         this.tradeAsync = tradeAsync;
+        this.calcScore = calcScore;
         this.createOrder = createOrder;
         this.current_assets = current_assets;
         this.current_assetsAsync = current_assetsAsync;
