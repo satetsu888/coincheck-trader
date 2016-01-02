@@ -124,7 +124,7 @@ var mainloop = function(){
                 console.log("CurrentAssets: " + assets);
             }).catch(function(err){
                 console.log(err.stack);
-                throw err;
+                reject(err);
             });
         })
         .then(sleep)
@@ -144,6 +144,7 @@ getBalanceAsync()
 .then(allowCreateOrderAsync)
 .then(mainloop)
 .catch(function(err){
+    console.log("err occured at out of main loop");
     console.log(err.stack);
 });
 
