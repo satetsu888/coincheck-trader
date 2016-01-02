@@ -79,13 +79,13 @@ var updateTradeAsync = function(trades){
     return new Promise(function(resolve, reject){
         console.log("update " + trades.length + " Trades");
         if(trades.length != 0){
-            trades.forEach(function(trade){
-                trader.updateTrades(trade, function(err, trader){
-                    if(err){
-                        reject(err);
-                    }
-                    resolve(trader);
-                });
+            co(function* (){
+                for(var i=0;i<trades.length;i++){
+                    yield trader.updateTradesAsync(trades[i]);
+                }
+                resolve(trader);
+            }).catch(function(err){
+                reject(err);
             });
         } else {
             resolve(trader);
