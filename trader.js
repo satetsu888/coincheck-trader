@@ -18,27 +18,27 @@ module.exports = (function(){
         });
     };
 
-    var updateTrades = function(trade, cb){
-        var self = this;
-        self.trades.push(trade);
-        self.stats.update_trade_count++;
-        if(self.trades.length > 100){
-            self.trades.shift();
-            if(self.order_allowed){
-                self.createOrder(self.trades, cb);
-            } else {
-                console.log("order not allowed");
-                cb(null, self);
-            }
-        } else {
-            cb(null, self);
-        }
-    };
-
     var updateTradesAsync = function(trade){
         var self = this;
         return new Promise(function(resolve, reject){
-            self.updateTrades(trade, function(err, trader){
+
+            self.trades.push(trade);
+            self.stats.update_trade_count++;
+
+            if(self.trades.length <= 100){
+                resolve(self);
+                return;
+            }
+
+            self.trades.shift();
+
+            if(!self.order_allowed){
+                console.log("order not allowed");
+                resolve(self);
+                return;
+            }
+
+            self.createOrder(self.trades, function(err, trader){
                 if(err){
                     reject(err);
                 } else {
@@ -231,7 +231,6 @@ module.exports = (function(){
         this.trades = [];
 
         this.updateLogAsync = updateLogAsync;
-        this.updateTrades = updateTrades;
         this.updateTradesAsync = updateTradesAsync;
         this.updateAsync = updateAsync;
         this.tradeAsync = tradeAsync;
