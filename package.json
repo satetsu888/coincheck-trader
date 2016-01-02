@@ -7,10 +7,10 @@
     "co": "^4.6.0",
     "genetic": "^0.3.1",
     "genetic-js": "^0.1.14",
-    "google-spreadsheet": "git://github.com/jmar777/node-google-spreadsheet.git#patch-1",
+    "google-spreadsheet": "git://github.com/satetsu888/node-google-spreadsheet.git",
     "md5": "^2.0.0",
     "mysql": "^2.9.0",
-    "node-coincheck": "git://github.com/satetsu888/node-coincheck.git#master",
+    "node-coincheck": "git://github.com/satetsu888/node-coincheck.git",
     "request": "^2.67.0",
     "sync-request": "^2.1.0"
   },
