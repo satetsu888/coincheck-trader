@@ -23,6 +23,10 @@ module.exports = (function(){
         var self = this;
         return new Promise(function(resolve, reject){
             co(function* (){
+                if(!self.order_allowed){
+                    resolve();
+                    return;
+                };
                 var orders = yield self.api.activeOrders();
                 // TODO 一定時間後にキャンセルする処理
                 resolve();
