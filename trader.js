@@ -2,6 +2,7 @@ module.exports = (function(){
     'use strict';
 
     var co = require('co');
+    var promisify = require('promisify-node');
     var coincheck = require('node-coincheck');
     var publicApi = coincheck.PublicApi;
 
@@ -15,6 +16,20 @@ module.exports = (function(){
             } else {
                 resolve(trader);
             }
+        });
+    };
+
+    var applyTradesAsync = function(){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            co(function* (){
+                var orders = yield self.api.activeOrders();
+                // TODO 一定時間後にキャンセルする処理
+                resolve();
+            }).catch(function(err){
+                console.log(err.stack);
+                reject(err);
+            });
         });
     };
 
@@ -52,6 +67,7 @@ module.exports = (function(){
         var self = this;
         return new Promise(function(resolve, reject){
             co(function* (){
+                yield self.applyTradesAsync();
                 yield self.updateTradesAsync(trade);
                 yield self.updateLogAsync(self);
                 resolve(self);
@@ -111,7 +127,7 @@ module.exports = (function(){
                    rate = Math.max(self.current_rate(), ticker.ask);
                 }
                 self.stats.order.sell++;
-                return yield self.tradeAsync(
+                return yield self.api.trade(
                     "btc_jpy",
                     "sell",
                     rate,
@@ -123,7 +139,7 @@ module.exports = (function(){
                    rate = Math.min(self.current_rate(), ticker.bid);
                 }
                 self.stats.order.buy++;
-                return yield self.tradeAsync(
+                return yield self.api.trade(
                     "btc_jpy",
                     "buy",
                     rate,
@@ -144,52 +160,28 @@ module.exports = (function(){
         });
     };
 
-    var tradeAsync = function(currency_pair, action, price, amount){
-        var self = this;
-        return new Promise(function(resolve, reject){
-            self.api.trade(currency_pair, action, price, amount, function(err, result){
-                if(err){
-                    reject(err);
-                } else {
-                    resolve(result);
-                }
-            });
-        });
-    };
-        
-
-    var current_assets = function(callback){
-        var self = this;
-        var balance = self.api.getBalance(function(err, balance){
-            if(err){
-                callback(err, null);
-                return;
-            }
-            var assets = parseFloat(balance.jpy) + parseFloat(balance.btc * self.current_rate());
-            self.current_yen = balance.jpy;
-            self.current_btc = balance.btc;
-            self.current_assets_all = assets;
-            if(self.stats.max_asset < assets){
-                self.stats.max_asset = assets;
-            }
-            var draw_down =  self.stats.max_asset - assets;
-            if(self.stats.max_draw_down < draw_down){
-                self.stats.max_draw_down = draw_down;
-            }
-            callback(null, assets);
-        });
-    };
-
     var current_assetsAsync = function(){
         var self = this;
         return new Promise(function(resolve, reject){
-            self.current_assets(function(err, result){
-                if(err){
-                    reject(err);
-                } else {
-                    resolve(result);
+            co(function* (){
+                var balance = yield self.api.getBalance();
+                var assets = parseFloat(balance.jpy) + parseFloat(balance.btc * self.current_rate());
+                self.current_yen = balance.jpy;
+                self.current_btc = balance.btc;
+                self.current_assets_all = assets;
+                if(self.stats.max_asset < assets){
+                    self.stats.max_asset = assets;
                 }
-            })
+                var draw_down =  self.stats.max_asset - assets;
+                if(self.stats.max_draw_down < draw_down){
+                    self.stats.max_draw_down = draw_down;
+                }
+
+                resolve(assets);
+            }).catch(function(err){
+                console.log(err);
+                reject(err);
+            });
         });
     };
 
@@ -219,7 +211,7 @@ module.exports = (function(){
             update_trade_count: 0,
         };
 
-        this.api = option.api;
+        this.api = promisify(option.api);
         this.logger = option.logger || undefined;
         this.calc_weight = option.calc_weight || 0.0001;
         this.order_weight = option.order_weight || 0.0001;
@@ -231,12 +223,11 @@ module.exports = (function(){
         this.trades = [];
 
         this.updateLogAsync = updateLogAsync;
+        this.applyTradesAsync = applyTradesAsync;
         this.updateTradesAsync = updateTradesAsync;
         this.updateAsync = updateAsync;
-        this.tradeAsync = tradeAsync;
         this.calcScore = calcScore;
         this.createOrder = createOrder;
-        this.current_assets = current_assets;
         this.current_assetsAsync = current_assetsAsync;
         this.current_rate = current_rate;
         this.last_trade = last_trade;

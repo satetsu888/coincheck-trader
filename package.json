@@ -11,6 +11,7 @@
     "md5": "^2.0.0",
     "mysql": "^2.9.0",
     "node-coincheck": "git://github.com/satetsu888/node-coincheck.git",
+    "promisify-node": "^0.3.0",
     "request": "^2.67.0",
     "sync-request": "^2.1.0"
   },
