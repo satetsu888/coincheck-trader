@@ -138,6 +138,7 @@ module.exports = (function(){
         var balance = self.api.getBalance(function(err, balance){
             if(err){
                 callback(err, null);
+                return;
             }
             var assets = parseFloat(balance.jpy) + parseFloat(balance.btc * self.current_rate());
             self.current_yen = balance.jpy;
