@@ -86,6 +86,7 @@ var updateTradeAsync = function(trades){
                 resolve(trader);
             }).catch(function(err){
                 reject(err);
+                return;
             });
         } else {
             resolve(trader);
@@ -125,6 +126,7 @@ var mainloop = function(){
             }).catch(function(err){
                 console.log(err.stack);
                 reject(err);
+                return;
             });
         })
         .then(sleep)

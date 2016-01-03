@@ -80,6 +80,7 @@ module.exports = (function(){
             }).catch(function(err){
                 console.log(err);
                 reject(err);
+                return;
             });
         });
     };
