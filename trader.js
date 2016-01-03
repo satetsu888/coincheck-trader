@@ -60,8 +60,10 @@ module.exports = (function(){
             self.createOrder(self.trades, function(err, trader){
                 if(err){
                     reject(err);
+                    return;
                 } else {
                     resolve(trader);
+                    return;
                 }
             });
         });
