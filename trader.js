@@ -34,7 +34,6 @@ module.exports = (function(){
                     order_cancel_date.setHours(order_cancel_date.getHours() + 24);
                     var current_date = new Date(self.last_trade().created_at);
                     if(order_cancel_date < current_date){
-                        console.log("api called");
                         yield self.api.cancelOrder(orders[i].id);
                     }
 

@@ -38,8 +38,6 @@ module.exports = (function(){
         this.orders.forEach(function(order){
             if(order.id == order_id){
                 order._status = "canceled";
-                console.log("order canceled");
-                console.log(order);
 
                 result = {
                     "success": true,
