@@ -33,6 +33,7 @@ var setupTraderAsync = function(res){
             order_allowed: false,
             order_weight: 0.0002,
             api: privateApi,
+            publicApi: publicApi,
             verbose: true,
             use_tick: true,
         };

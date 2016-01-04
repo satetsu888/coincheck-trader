@@ -3,8 +3,6 @@ module.exports = (function(){
 
     var co = require('co');
     var promisify = require('promisify-node');
-    var coincheck = require('node-coincheck');
-    var publicApi = coincheck.PublicApi;
 
     var updateLogAsync = function(trader){
         var self = this;
@@ -39,7 +37,6 @@ module.exports = (function(){
 
                 };
 
-                // TODO 一定時間後にキャンセルする処理
                 resolve();
             }).catch(function(err){
                 console.log(err.stack);
@@ -126,7 +123,7 @@ module.exports = (function(){
             var ticker;
             if(self.use_tick){
                 ticker = yield new Promise(function(resolve, reject){
-                    publicApi.ticker(function(err, result){
+                    self.publicApi.ticker(function(err, result){
                         if(err){
                             reject(err);
                         } else {
@@ -173,6 +170,7 @@ module.exports = (function(){
             }
             cb(null, self);
         }).catch(function(err){
+            console.log(err);
             console.log(err.stack);
             cb(err, null);
         });
@@ -230,6 +228,7 @@ module.exports = (function(){
         };
 
         this.api = promisify(option.api);
+        this.publicApi = promisify(option.publicApi);
         this.logger = option.logger || undefined;
         this.calc_weight = option.calc_weight || 0.0001;
         this.order_weight = option.order_weight || 0.0001;
