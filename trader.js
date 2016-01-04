@@ -27,7 +27,19 @@ module.exports = (function(){
                     resolve();
                     return;
                 };
+
                 var orders = yield self.api.activeOrders();
+                for(var i=0;i<orders.length;i++){
+                    var order_cancel_date = new Date(orders[i].created_at);
+                    order_cancel_date.setHours(order_cancel_date.getHours() + 24);
+                    var current_date = new Date(self.last_trade().created_at);
+                    if(order_cancel_date < current_date){
+                        console.log("api called");
+                        yield self.api.cancelOrder(orders[i].id);
+                    }
+
+                };
+
                 // TODO 一定時間後にキャンセルする処理
                 resolve();
             }).catch(function(err){
@@ -78,7 +90,7 @@ module.exports = (function(){
                 yield self.updateLogAsync(self);
                 resolve(self);
             }).catch(function(err){
-                console.log(err);
+                console.log(err.stack);
                 reject(err);
                 return;
             });
@@ -162,7 +174,7 @@ module.exports = (function(){
             }
             cb(null, self);
         }).catch(function(err){
-            console.log(err);
+            console.log(err.stack);
             cb(err, null);
         });
     };
@@ -186,7 +198,7 @@ module.exports = (function(){
 
                 resolve(assets);
             }).catch(function(err){
-                console.log(err);
+                console.log(err.stack);
                 reject(err);
             });
         });

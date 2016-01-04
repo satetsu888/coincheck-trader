@@ -19,16 +19,24 @@ module.exports = (function(){
                 stats : trader.stats,
             };
         }).then(function(result){
-            callback(result);
+            callback(null, result);
         }).catch(function(err){
-            console.log(err);
+            console.log(err.stack);
+            callback(err, null);
         });
     };
 
     var calcScoreAsync = function(entity){
         var self = this;
         return new Promise(function(resolve, reject){
-            self.calcScore(entity, resolve);
+            self.calcScore(entity, function(err, result){
+                if(err){
+                    reject(err);
+                    return;
+                } else {
+                    resolve(result);
+                }
+            });
         });
     };
 
@@ -36,7 +44,7 @@ module.exports = (function(){
         var self = this;
         var seriarized_entity = self.seriarize(entity);
         if(self.cache[seriarized_entity]){
-            callback(self.cache[seriarized_entity]);
+            callback(null, self.cache[seriarized_entity]);
         }
 
         var api = require(base_dir + '/api_mock.js');
@@ -69,16 +77,25 @@ module.exports = (function(){
             }
             //console.log("finish");
             self.cache[seriarized_entity] = trader;
-            callback(self.cache[seriarized_entity]);    
+            callback(null, self.cache[seriarized_entity]);    
         }).catch(function(err){
-            console.log(err);
+            console.log(err.stack);
+            callback(err, null);
         });
     };
 
     var doFitnessAsync = function(entity){
         var self = this;
         return new Promise(function(resolve, reject){
-            self.doFitness(entity, resolve);
+            self.doFitness(entity, function(err, result){
+                if(err){
+                    reject(err);
+                    return;
+                } else {
+                    resolve(result);
+                }
+                
+            });
         });
     };
 

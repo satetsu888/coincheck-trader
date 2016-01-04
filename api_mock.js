@@ -34,7 +34,20 @@ module.exports = (function(){
 
     var cancelOrder = function(order_id, callback){
         var result = {};
-        // TODO
+
+        this.orders.forEach(function(order){
+            if(order.id == order_id){
+                order._status = "canceled";
+                console.log("order canceled");
+                console.log(order);
+
+                result = {
+                    "success": true,
+                    "id": order.id
+                };
+            }
+        });
+
         setTimeout(callback, 1, null, result);
     };
 
@@ -91,14 +104,6 @@ module.exports = (function(){
 
         this.orders.forEach(function(order, index){
             if(order._status != "open"){
-                return;
-            }
-
-            var order_cancel_date = new Date(order.created_at);
-            order_cancel_date.setDate(order_cancel_date.getDate() + 1);
-            var trade_date = new Date(trade.created_at);
-            if(order_cancel_date  < trade.created_at){
-                order._status = "canceled";
                 return;
             }
 
