@@ -101,7 +101,8 @@ var update = function(offset){
             fetchTradesAsync(offset)
             .then(filterTradesAsync)
             .then(updateTradeAsync)
-            .then(resolve);
+            .then(resolve)
+            .catch(reject);
         }).catch(function(e){
             console.log(e);
             reject(e);
