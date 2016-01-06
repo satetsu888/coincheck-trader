@@ -180,10 +180,21 @@ module.exports = (function(){
         var self = this;
         return new Promise(function(resolve, reject){
             co(function* (){
-                var balance = yield self.api.getBalance();
-                var assets = parseFloat(balance.jpy) + parseFloat(balance.btc * self.current_rate());
-                self.current_yen = balance.jpy;
-                self.current_btc = balance.btc;
+                var balance;
+                var assets;
+                if(self.mode == 'spot'){
+                    balance = yield self.api.getBalance();
+                    assets = parseFloat(balance.jpy) + parseFloat(balance.btc * self.current_rate());
+                    self.current_yen = balance.jpy;
+                    self.current_btc = balance.btc;
+                } else if(self.mode == 'future'){
+                    balance = yield self.api.getLeverageBalance();
+                    assets = balance.margin.jpy;
+                    self.current_yen = assets;
+                } else {
+                    reject('invalid mode');
+                }
+
                 self.current_assets_all = assets;
                 if(self.stats.max_asset < assets){
                     self.stats.max_asset = assets;
@@ -236,6 +247,7 @@ module.exports = (function(){
         this.order_allowed = option.order_allowed || false;
         this.verbose = option.verbose || false;
         this.use_tick = option.use_tick || false;
+        this.mode = option.mode || 'spot';
 
         this.trades = [];
 

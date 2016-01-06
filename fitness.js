@@ -65,6 +65,7 @@ module.exports = (function(){
             order_weight: 0.0002,
             api: new api(config),
             logger: myLogger,
+            mode: 'spot',
         };
 
         var trader = new Trader(entity, config, option);
