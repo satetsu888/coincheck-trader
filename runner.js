@@ -103,9 +103,6 @@ var update = function(offset){
             .then(updateTradeAsync)
             .then(resolve)
             .catch(reject);
-        }).catch(function(e){
-            console.log(e);
-            reject(e);
         });
     }
 };
