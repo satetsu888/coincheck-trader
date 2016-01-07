@@ -55,13 +55,19 @@ module.exports = (function(){
             return;
         }
 
-        var result = this.orders.filter(function(element){
+        var orders = this.orders.filter(function(element){
             if(element._status == "open"){
                 return true;
             } else {
                 return false;
             }
         });
+
+        var result = {
+            "success": true,
+            "orders" : orders
+        }
+
         setTimeout(callback, 1, null, result);
     };
 

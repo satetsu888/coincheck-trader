@@ -26,7 +26,8 @@ module.exports = (function(){
                     return;
                 };
 
-                var orders = yield self.api.activeOrders();
+                var result = yield self.api.activeOrders();
+                var orders = result.orders;
                 for(var i=0;i<orders.length;i++){
                     var order_cancel_date = new Date(orders[i].created_at);
                     order_cancel_date.setHours(order_cancel_date.getHours() + 24);
