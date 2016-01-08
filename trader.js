@@ -25,7 +25,10 @@ module.exports = (function(){
                     resolve();
                     return;
                 };
-                var current_date = new Date(self.last_trade().created_at);
+                var current_date = 0;
+                if(self.last_trade()){
+                    current_date = new Date(self.last_trade().created_at);
+                }
 
                 var result = yield self.api.activeOrders();
                 var orders = result.orders;
@@ -48,7 +51,7 @@ module.exports = (function(){
                     if(position_cancel_date < current_date){
                         self.stats.cancel_position++;
                         var action;
-                        if(position.side == "buy"){
+                        if(positions[i].side == "buy"){
                             action = "close_long";
                         } else {
                             action = "close_short";
@@ -57,8 +60,8 @@ module.exports = (function(){
                             "btc_jpy",
                             action,
                             null,
-                            posiiton.amount,
-                            position.id
+                            positions[i].amount,
+                            positions[i].id
                         );
                     }
 
@@ -427,7 +430,7 @@ module.exports = (function(){
         this._createSpotOrder = _createSpotOrder;
         this._createFutureOrder = _createFutureOrder;
 
-        console.log(option);
+        //console.log(option);
     }
 
     return Trader;
