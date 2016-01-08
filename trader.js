@@ -25,6 +25,7 @@ module.exports = (function(){
                     resolve();
                     return;
                 };
+                var current_date = new Date(self.last_trade().created_at);
 
                 var result = yield self.api.activeOrders();
                 var orders = result.orders;
@@ -32,9 +33,33 @@ module.exports = (function(){
                 for(var i=0;i<orders.length;i++){
                     var order_cancel_date = new Date(orders[i].created_at);
                     order_cancel_date.setHours(order_cancel_date.getHours() + 5);
-                    var current_date = new Date(self.last_trade().created_at);
                     if(order_cancel_date < current_date){
+                        self.stats.cancel_order++;
                         yield self.api.cancelOrder(orders[i].id);
+                    }
+
+                };
+
+                var positionsResult = yield self.api.getLeveragePositions('open');
+                var positions = positionsResult.data;
+                for(var i=0;i<positions.length;i++){
+                    var position_cancel_date = new Date(positions[i].created_at);
+                    position_cancel_date.setHours(position_cancel_date.getHours() + 10);
+                    if(position_cancel_date < current_date){
+                        self.stats.cancel_position++;
+                        var action;
+                        if(position.side == "buy"){
+                            action = "close_long";
+                        } else {
+                            action = "close_short";
+                        }
+                        yield self.api.closeTrade(
+                            "btc_jpy",
+                            action,
+                            null,
+                            posiiton.amount,
+                            position.id
+                        );
                     }
 
                 };
@@ -371,6 +396,8 @@ module.exports = (function(){
                 long: 0,
                 short: 0,
             },
+            cancel_order: 0,
+            cancel_position: 0,
             update_trade_count: 0,
         };
 

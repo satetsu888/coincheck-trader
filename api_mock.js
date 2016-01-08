@@ -35,6 +35,10 @@ module.exports = (function(){
     var closeTrade = function(currency_pair, action, price, amount, position_id, callback){
         var id = Math.floor(Math.random() * 0xFFFF);
 
+        if(!price){
+            price = this.current_rate;
+        }
+
         var result = {
             "success": true,
             "id": id,
@@ -49,7 +53,7 @@ module.exports = (function(){
             id: id,
             order_type: action,
             rate: price,
-            pair: currency_pair || "btc_jpy_jpy",
+            pair: currency_pair || "btc_jpy",
             pending_amount: amount,
             created_at: this.current_time,
             _original_amount: amount,
