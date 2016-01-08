@@ -58,7 +58,7 @@ module.exports = (function(){
         };
         console.log(order);
         this.orders.push(order);
-    });
+    };
 
     var getLeveragePositions = function(status, callback){
         var result;
