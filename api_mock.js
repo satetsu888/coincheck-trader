@@ -27,6 +27,11 @@ module.exports = (function(){
             _status: "open",
         };
         console.log(order);
+
+        if(action == "leverage_buy" || action == "leverage_sell"){
+            this.current_yen -= (amount * price) * 0.0005;
+        }
+
         this.orders.push(order);
 
         setTimeout(callback, 1, null, result);
