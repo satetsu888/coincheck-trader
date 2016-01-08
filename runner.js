@@ -109,7 +109,7 @@ var update = function(offset){
 
 var sleep = function(){
     return new Promise(function(resolve, reject){
-        setTimeout(resolve, 5000);
+        setTimeout(resolve, 4000);
     });
 };
 
