@@ -118,6 +118,19 @@ module.exports = (function(){
         var self = this;
         self.current_score = self.calcScore(trades, {});
 
+        if(self.mode = 'spot'){
+            self._createSpotOrder(cb);
+        } else if(self.mode = 'future'){
+            self._createFutureOrder(cb);
+        } else {
+            console.log('invalid mode');
+            cb('invalid mode', null);
+        }
+    };
+
+    var _createSpotOrder = function(cb){
+        var self = this;
+
         var amount = Math.floor(Math.abs(self.order_weight * self.current_score * self.entity[101]) * 10000) / 10000;
 
         co(function* (){
@@ -177,6 +190,117 @@ module.exports = (function(){
         });
     };
 
+    var _createFutureOrder = function(cb){
+        var self = this;
+
+        var amount = Math.floor(Math.abs(self.order_weight * self.current_score * self.entity[101]) * 10000) / 10000;
+
+        co(function* (){
+            var ticker;
+            if(self.use_tick){
+                ticker = yield new Promise(function(resolve, reject){
+                    self.publicApi.ticker(function(err, result){
+                        if(err){
+                            reject(err);
+                        } else {
+                            resolve(result);
+                        }
+                    });
+                });
+            }
+            if(self.verbose){
+                console.log("tick: " + JSON.stringify(ticker));
+            }
+
+            var positionsResult = yield self.api.getLeveragePositions('open');
+            var positions = positionsResult.data;
+            console.log(positions);
+            var shortPositions = positions.filter(function(position){
+                if(position.side == "sell"){
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+            var longPositions = positions.filter(function(position){
+                if(position.side == "buy"){
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            var action = "noop";
+            if(self.current_score < -1 * self.order_threshold){
+                action = "sell";
+            } else if(self.order_threshold < self.current_score){
+                action = "buy";
+            }
+
+            if(positions.length == 0 && action == "sell"){
+                var rate = self.current_rate();
+                if(self.use_tick){
+                   rate = Math.max(self.current_rate(), ticker.ask);
+                }
+                self.stats.order.short++;
+                return yield self.api.trade(
+                    "btc_jpy",
+                    "leverage_sell",
+                    rate,
+                    amount
+                );
+            } else if(positions.length == 0 && action == "buy"){
+                var rate = self.current_rate();
+                if(self.use_tick){
+                   rate = Math.min(self.current_rate(), ticker.bid);
+                }
+                self.stats.order.long++;
+                return yield self.api.trade(
+                    "btc_jpy",
+                    "leverage_buy",
+                    rate,
+                    amount
+                );
+            } else if(longPositions.length > 0 && action == "sell"){
+                var position = longPositions[0];
+                amount = Math.min(amount, position.amount);
+                return yield self.api.closeTrade(
+                    "btc_jpy",
+                    "close_long",
+                    rate,
+                    amount,
+                    position.id
+                );
+
+            } else if(shortPositions.length > 0 && action == "buy"){
+                var position = shortPositions[0];
+                amount = Math.min(amount, position.amount);
+                return yield self.api.closeTrade(
+                    "btc_jpy",
+                    "close_long",
+                    rate,
+                    amount,
+                    position.id
+                );
+
+            }
+        }).then(function(result){
+            if(result && self.verbose){
+                console.log(result);
+            }
+            if(self.verbose){
+                console.log("current score: " + self.current_score);
+            }
+            cb(null, self);
+        }).catch(function(err){
+            console.log(err);
+            console.log(err.stack);
+            cb(err, null);
+        });
+
+    };
+
+
     var current_assetsAsync = function(){
         var self = this;
         return new Promise(function(resolve, reject){
@@ -235,6 +359,8 @@ module.exports = (function(){
             order: {
                 buy: 0,
                 sell: 0,
+                long: 0,
+                short: 0,
             },
             update_trade_count: 0,
         };
@@ -261,6 +387,9 @@ module.exports = (function(){
         this.current_assetsAsync = current_assetsAsync;
         this.current_rate = current_rate;
         this.last_trade = last_trade;
+
+        this._createSpotOrder = _createSpotOrder;
+        this._createFutureOrder = _createFutureOrder;
 
         //console.log(option);
     }
