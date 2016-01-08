@@ -28,9 +28,10 @@ module.exports = (function(){
 
                 var result = yield self.api.activeOrders();
                 var orders = result.orders;
+                //console.log(orders);
                 for(var i=0;i<orders.length;i++){
                     var order_cancel_date = new Date(orders[i].created_at);
-                    order_cancel_date.setHours(order_cancel_date.getHours() + 24);
+                    order_cancel_date.setHours(order_cancel_date.getHours() + 5);
                     var current_date = new Date(self.last_trade().created_at);
                     if(order_cancel_date < current_date){
                         yield self.api.cancelOrder(orders[i].id);
@@ -101,7 +102,7 @@ module.exports = (function(){
         var sign;
         trades.forEach(function(element, index){
             if( element.order_type == "buy"){
-                sign = 1;    
+                sign = 1;
             } else if( element.order_type == "sell"){
                 sign = -1;
             }
@@ -118,9 +119,9 @@ module.exports = (function(){
         var self = this;
         self.current_score = self.calcScore(trades, {});
 
-        if(self.mode = 'spot'){
+        if(self.mode == 'spot'){
             self._createSpotOrder(cb);
-        } else if(self.mode = 'future'){
+        } else if(self.mode == 'future'){
             self._createFutureOrder(cb);
         } else {
             console.log('invalid mode');
@@ -214,7 +215,7 @@ module.exports = (function(){
 
             var positionsResult = yield self.api.getLeveragePositions('open');
             var positions = positionsResult.data;
-            console.log(positions);
+            //console.log(positions);
             var shortPositions = positions.filter(function(position){
                 if(position.side == "sell"){
                     return true;
@@ -262,6 +263,10 @@ module.exports = (function(){
                     amount
                 );
             } else if(longPositions.length > 0 && action == "sell"){
+                var rate = self.current_rate();
+                if(self.use_tick){
+                   rate = Math.min(self.current_rate(), ticker.bid);
+                }
                 var position = longPositions[0];
                 amount = Math.min(amount, position.amount);
                 return yield self.api.closeTrade(
@@ -273,11 +278,15 @@ module.exports = (function(){
                 );
 
             } else if(shortPositions.length > 0 && action == "buy"){
+                var rate = self.current_rate();
+                if(self.use_tick){
+                   rate = Math.min(self.current_rate(), ticker.bid);
+                }
                 var position = shortPositions[0];
                 amount = Math.min(amount, position.amount);
                 return yield self.api.closeTrade(
                     "btc_jpy",
-                    "close_long",
+                    "close_short",
                     rate,
                     amount,
                     position.id
@@ -391,7 +400,7 @@ module.exports = (function(){
         this._createSpotOrder = _createSpotOrder;
         this._createFutureOrder = _createFutureOrder;
 
-        //console.log(option);
+        console.log(option);
     }
 
     return Trader;

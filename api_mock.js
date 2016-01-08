@@ -58,14 +58,22 @@ module.exports = (function(){
         };
         console.log(order);
         this.orders.push(order);
+
+        setTimeout(callback, 1, null, result);
     };
 
     var getLeveragePositions = function(status, callback){
         var result;
         if(status == "open"){
+            var data;
+            if(this.open_positions.buy || this.open_positions.sell){
+                data = [ this.open_positions.buy || this.open_positions.sell ];
+            } else {
+                data = [];
+            }
             result =  {
                 "success": true,
-                "data": [ this.open_positions.buy || this.open_positions.sell ]
+                "data": data,
             }
         } else if(status =="close"){
             // TODO
@@ -198,7 +206,7 @@ module.exports = (function(){
                     if(order.pending_amount <= 0){
                         order._status = "closed";
                     }
-                    this._open_position("buy", trade.rate, traded_amount);
+                    self._open_position("buy", trade.rate, traded_amount);
                 }
             } else if(order.order_type == "leverage_sell"){
                     var traded_amount = Math.min(order.pending_amount, trade.amount);
@@ -206,21 +214,21 @@ module.exports = (function(){
                     if(order.pending_amount <= 0){
                         order._status = "closed";
                     }
-                    this._open_position("sell", trade.rate, traded_amount);
+                    self._open_position("sell", trade.rate, traded_amount);
             } else if(order.order_type == "close_long"){
                     var traded_amount = Math.min(order.pending_amount, trade.amount);
                     order.pending_amount -= traded_amount;
                     if(order.pending_amount <= 0){
                         order._status = "closed";
                     }
-                    this._close_position("buy", trade.rate, traded_amount);
+                    self._close_position("buy", trade.rate, traded_amount);
             } else if(order.order_type == "close_short"){
                     var traded_amount = Math.min(order.pending_amount, trade.amount);
                     order.pending_amount -= traded_amount;
                     if(order.pending_amount <= 0){
                         order._status = "closed";
                     }
-                    this._close_position("sell", trade.rate, traded_amount);
+                    self._close_position("sell", trade.rate, traded_amount);
             }
         });
     };
@@ -266,13 +274,14 @@ module.exports = (function(){
                 sign = -1;
             }
 
-            self.current_yen += sign * amount * (rate - old_position.rate);
+            this.current_yen += sign * amount * (rate - old_position.open_rate);
 
             if(old_position.amount - amount <= 0){
                 this.closed_posisions.push(this.open_positions[side]);
                 this.open_positions[side] = null;
             }
         }
+        console.log("yen: " + this.current_yen);
     };
 
 
