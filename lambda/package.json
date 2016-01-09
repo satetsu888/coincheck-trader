@@ -1,0 +1,27 @@
+{
+  "name": "coincheck-trader-genetic",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha test/*.js",
+    "zip": "zip -r coincheck-trade-genetic-lambda.zip index.js"
+  },
+  "author": "satetsu888",
+  "license": "MIT, Donationware",
+  "dependencies": {
+    "babel-polyfill": "^6.3.14",
+    "co": "^4.6.0",
+    "promisify-node": "^0.3.0"
+  },
+  "devDependencies": {
+    "babel-core": "^6.4.0",
+    "babel-loader": "^6.2.1",
+    "babel-plugin-syntax-flow": "^6.3.13",
+    "babel-plugin-transform-flow-strip-types": "^6.4.0",
+    "babel-preset-es2015": "^6.3.13",
+    "json-loader": "^0.5.4",
+    "mocha": "^2.3.4",
+    "webpack": "^1.12.10"
+  }
+}
