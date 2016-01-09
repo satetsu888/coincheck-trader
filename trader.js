@@ -243,7 +243,6 @@ module.exports = (function(){
 
             var positionsResult = yield self.api.getLeveragePositions('open');
             var positions = positionsResult.data;
-            //console.log(positions);
             var shortPositions = positions.filter(function(position){
                 if(position.side == "sell"){
                     return true;
@@ -264,6 +263,13 @@ module.exports = (function(){
                 if(self.use_tick){
                    rate = Math.max(self.current_rate(), ticker.ask);
                 }
+
+                var result = yield self.api.activeOrders();
+                var orders = result.orders;
+                for(var i=0;i<orders.length;i++){
+                    yield self.api.cancelOrder(orders[i].id);
+                }
+
                 self.stats.order.short++;
                 return yield self.api.trade(
                     "btc_jpy",
@@ -276,6 +282,13 @@ module.exports = (function(){
                 if(self.use_tick){
                    rate = Math.min(self.current_rate(), ticker.bid);
                 }
+
+                var result = yield self.api.activeOrders();
+                var orders = result.orders;
+                for(var i=0;i<orders.length;i++){
+                    yield self.api.cancelOrder(orders[i].id);
+                }
+
                 self.stats.order.long++;
                 return yield self.api.trade(
                     "btc_jpy",
