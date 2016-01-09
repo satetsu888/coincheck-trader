@@ -1,6 +1,7 @@
 var assert = require('assert');
 
 describe('basic',function(){
+    this.timeout(300000);
     it('Should create', function(testDone){
         var data = {
             entity: require('./bot.json'),
