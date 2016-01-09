@@ -37,7 +37,10 @@ module.exports = (function(){
             if(self.scoreCache[seriarized_entity]){
                 console.log("cache hit");
                 console.log(self.scoreCache);
-                resolve(self.scoreCache[seriarized_entity]);
+                resolve({
+                    "message": "cached score",
+                    "score": self.scoreCache[seriarized_entity],
+                });
             }
 
             self.calcScore(entity, function(err, result){
