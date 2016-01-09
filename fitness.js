@@ -17,6 +17,7 @@ module.exports = (function(){
             return {
                 score : parseFloat(asset - 50000) - parseFloat(trader.stats.max_draw_down),
                 stats : trader.stats,
+                entity: entity,
             };
         }).then(function(result){
             callback(null, result);
