@@ -259,14 +259,7 @@ module.exports = (function(){
                 }
             });
 
-            var action = "noop";
-            if(self.current_score < -1 * self.order_threshold){
-                action = "sell";
-            } else if(self.order_threshold < self.current_score){
-                action = "buy";
-            }
-
-            if(positions.length == 0 && action == "sell"){
+            if(positions.length == 0 && self.current_score < -1 * self.order_threshold){
                 var rate = self.current_rate();
                 if(self.use_tick){
                    rate = Math.max(self.current_rate(), ticker.ask);
@@ -278,7 +271,7 @@ module.exports = (function(){
                     rate,
                     amount
                 );
-            } else if(positions.length == 0 && action == "buy"){
+            } else if(positions.length == 0 && self.order_threshold < self.current_score){
                 var rate = self.current_rate();
                 if(self.use_tick){
                    rate = Math.min(self.current_rate(), ticker.bid);
@@ -290,7 +283,7 @@ module.exports = (function(){
                     rate,
                     amount
                 );
-            } else if(longPositions.length > 0 && action == "sell"){
+            } else if(longPositions.length > 0 && self.current_score < -1 * self.close_threshold){
                 var rate = self.current_rate();
                 if(self.use_tick){
                    rate = Math.min(self.current_rate(), ticker.bid);
@@ -305,7 +298,7 @@ module.exports = (function(){
                     position.id
                 );
 
-            } else if(shortPositions.length > 0 && action == "buy"){
+            } else if(shortPositions.length > 0 && self.close_threshold < self.current_score){
                 var rate = self.current_rate();
                 if(self.use_tick){
                    rate = Math.min(self.current_rate(), ticker.bid);
@@ -410,6 +403,7 @@ module.exports = (function(){
         this.calc_weight = option.calc_weight || 0.0001;
         this.order_weight = option.order_weight || 0.0001;
         this.order_threshold = option.order_threshold || 100;
+        this.close_threshold = option.close_threshold || this.order_threshold * 0.7;
         this.order_allowed = option.order_allowed || false;
         this.verbose = option.verbose || false;
         this.use_tick = option.use_tick || false;
