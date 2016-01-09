@@ -10,6 +10,7 @@ module.exports = (function(){
 
     var calcScore = function(entity, callback){
         var self = this;
+
         co(function* (){
             var trader = yield self.doFitnessAsync(entity);
             var asset = yield trader.current_assetsAsync();
@@ -20,6 +21,8 @@ module.exports = (function(){
                 entity: entity,
             };
         }).then(function(result){
+            var seriarized_entity = self.seriarize(entity);
+            self.scoreCache[seriarized_entity] = result.score;
             callback(null, result);
         }).catch(function(err){
             console.log(err.stack);
@@ -30,6 +33,13 @@ module.exports = (function(){
     var calcScoreAsync = function(entity){
         var self = this;
         return new Promise(function(resolve, reject){
+            var seriarized_entity = self.seriarize(entity);
+            if(self.scoreCache[seriarized_entity]){
+                console.log("cache hit");
+                console.log(self.scoreCache);
+                resolve(self.scoreCache[seriarized_entity]);
+            }
+
             self.calcScore(entity, function(err, result){
                 if(err){
                     reject(err);
@@ -43,10 +53,6 @@ module.exports = (function(){
 
     var doFitness = function(entity, callback){
         var self = this;
-        var seriarized_entity = self.seriarize(entity);
-        if(self.cache[seriarized_entity]){
-            callback(null, self.cache[seriarized_entity]);
-        }
 
         var api = require(base_dir + '/api_mock.js');
         var logger = require(base_dir + '/spreadsheet_logger.js');
@@ -78,8 +84,7 @@ module.exports = (function(){
                 yield trader.updateAsync(self.train[i]);
             }
             //console.log("finish");
-            self.cache[seriarized_entity] = trader;
-            callback(null, self.cache[seriarized_entity]);    
+            callback(null, trader);
         }).catch(function(err){
             console.log(err.stack);
             callback(err, null);
@@ -110,7 +115,7 @@ module.exports = (function(){
         this.file = file;
         this.logging = false;
         this.train = JSON.parse(fs.readFileSync(file, 'utf8'));
-        this.cache = {};
+        this.scoreCache = {};
         this.calcScore = calcScore;
         this.calcScoreAsync = calcScoreAsync;
         this.doFitness = doFitness;

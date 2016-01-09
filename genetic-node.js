@@ -7,7 +7,7 @@ var Fitness = require(base_dir + '/fitness.js');
 var userData = {
     tradesLength: 102,
     orderSize: 1,
-    fitness: new Fitness('train_recent.json'),
+    fitness: new Fitness('train_test.json'),
 };
 
 function getRandomSolution(callback) {
@@ -82,7 +82,7 @@ function stopCriteria() {
 
 var  options = {
     getRandomSolution : getRandomSolution,
-    popSize : 30,
+    popSize : 200,
     stopCriteria : stopCriteria,
     fitness : fitness,
     minimize : false,
