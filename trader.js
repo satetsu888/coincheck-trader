@@ -257,13 +257,12 @@ module.exports = (function(){
                     return false;
                 }
             });
+            var rate = self.current_rate();
+            if(self.use_tick){
+                rate = Math.max(self.current_rate(), ticker.ask);
+            }
 
             if(positions.length == 0 && self.current_score < -1 * self.order_threshold){
-                var rate = self.current_rate();
-                if(self.use_tick){
-                   rate = Math.max(self.current_rate(), ticker.ask);
-                }
-
                 var result = yield self.api.activeOrders();
                 var orders = result.orders;
                 for(var i=0;i<orders.length;i++){
@@ -278,10 +277,6 @@ module.exports = (function(){
                     amount
                 );
             } else if(positions.length == 0 && self.order_threshold < self.current_score){
-                var rate = self.current_rate();
-                if(self.use_tick){
-                   rate = Math.min(self.current_rate(), ticker.bid);
-                }
 
                 var result = yield self.api.activeOrders();
                 var orders = result.orders;
@@ -297,10 +292,6 @@ module.exports = (function(){
                     amount
                 );
             } else if(longPositions.length > 0 && self.current_score < -1 * self.close_threshold){
-                var rate = self.current_rate();
-                if(self.use_tick){
-                   rate = Math.min(self.current_rate(), ticker.bid);
-                }
                 var position = longPositions[0];
                 amount = Math.min(amount, position.amount);
                 return yield self.api.closeTrade(
@@ -312,10 +303,6 @@ module.exports = (function(){
                 );
 
             } else if(shortPositions.length > 0 && self.close_threshold < self.current_score){
-                var rate = self.current_rate();
-                if(self.use_tick){
-                   rate = Math.min(self.current_rate(), ticker.bid);
-                }
                 var position = shortPositions[0];
                 amount = Math.min(amount, position.amount);
                 return yield self.api.closeTrade(
