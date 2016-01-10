@@ -262,9 +262,10 @@ module.exports = (function(){
                 rate = Math.max(self.current_rate(), ticker.ask);
             }
 
+            var result = yield self.api.activeOrders();
+            var orders = result.orders;
+
             if(positions.length == 0 && self.current_score < -1 * self.order_threshold){
-                var result = yield self.api.activeOrders();
-                var orders = result.orders;
                 for(var i=0;i<orders.length;i++){
                     yield self.api.cancelOrder(orders[i].id);
                 }
@@ -277,9 +278,6 @@ module.exports = (function(){
                     amount
                 );
             } else if(positions.length == 0 && self.order_threshold < self.current_score){
-
-                var result = yield self.api.activeOrders();
-                var orders = result.orders;
                 for(var i=0;i<orders.length;i++){
                     yield self.api.cancelOrder(orders[i].id);
                 }
@@ -293,26 +291,54 @@ module.exports = (function(){
                 );
             } else if(longPositions.length > 0 && self.current_score < -1 * self.close_threshold){
                 var position = longPositions[0];
-                amount = Math.min(amount, position.amount);
-                return yield self.api.closeTrade(
+                var close_amount = Math.min(amount, position.amount);
+                var result = {};
+                result["close"] = yield self.api.closeTrade(
                     "btc_jpy",
                     "close_long",
                     rate,
-                    amount,
+                    close_amount,
                     position.id
                 );
+                if(self.current_score < -1 * self.order_threshold){
+                    for(var i=0;i<orders.length;i++){
+                        yield self.api.cancelOrder(orders[i].id);
+                    }
 
+                    self.stats.order.short++;
+                    result["open"] =  yield self.api.trade(
+                        "btc_jpy",
+                        "leverage_sell",
+                        rate,
+                        amount
+                    );
+                }
+                return result;
             } else if(shortPositions.length > 0 && self.close_threshold < self.current_score){
                 var position = shortPositions[0];
-                amount = Math.min(amount, position.amount);
-                return yield self.api.closeTrade(
+                var close_amount = Math.min(amount, position.amount);
+                var result = {};
+                result["close"] = yield self.api.closeTrade(
                     "btc_jpy",
                     "close_short",
                     rate,
-                    amount,
+                    close_amount,
                     position.id
                 );
+                if(self.order_threshold < self.current_score){
+                    for(var i=0;i<orders.length;i++){
+                        yield self.api.cancelOrder(orders[i].id);
+                    }
 
+                    self.stats.order.long++;
+                    result["open"] = yield self.api.trade(
+                        "btc_jpy",
+                        "leverage_buy",
+                        rate,
+                        amount
+                    );
+                }
+                return result;
             }
         }).then(function(result){
             if(result && self.verbose){
