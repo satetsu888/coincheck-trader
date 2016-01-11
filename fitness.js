@@ -35,8 +35,8 @@ module.exports = (function(){
         return new Promise(function(resolve, reject){
             var seriarized_entity = self.seriarize(entity);
             if(self.scoreCache[seriarized_entity]){
-                console.log("cache hit");
-                console.log(self.scoreCache);
+                //console.log("cache hit");
+                //console.log(self.scoreCache);
                 resolve({
                     "message": "cached score",
                     "score": self.scoreCache[seriarized_entity],
