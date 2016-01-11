@@ -269,6 +269,9 @@ module.exports = (function(){
                 for(var i=0;i<orders.length;i++){
                     yield self.api.cancelOrder(orders[i].id);
                 }
+                if(self.use_tick){
+                    rate = Math.max(self.current_rate(), ticker.ask);
+                }
 
                 self.stats.order.short++;
                 return yield self.api.trade(
@@ -280,6 +283,9 @@ module.exports = (function(){
             } else if(positions.length == 0 && self.order_threshold < self.current_score){
                 for(var i=0;i<orders.length;i++){
                     yield self.api.cancelOrder(orders[i].id);
+                }
+                if(self.use_tick){
+                   rate = Math.min(self.current_rate(), ticker.bid);
                 }
 
                 self.stats.order.long++;
@@ -293,6 +299,9 @@ module.exports = (function(){
                 var position = longPositions[0];
                 var close_amount = Math.min(amount, position.amount);
                 var result = {};
+                if(self.use_tick){
+                   rate = Math.min(self.current_rate(), ticker.bid);
+                }
                 result["close"] = yield self.api.closeTrade(
                     "btc_jpy",
                     "close_long",
@@ -318,6 +327,9 @@ module.exports = (function(){
                 var position = shortPositions[0];
                 var close_amount = Math.min(amount, position.amount);
                 var result = {};
+                if(self.use_tick){
+                    rate = Math.max(self.current_rate(), ticker.ask);
+                }
                 result["close"] = yield self.api.closeTrade(
                     "btc_jpy",
                     "close_short",
