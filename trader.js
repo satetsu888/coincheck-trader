@@ -314,7 +314,7 @@ module.exports = (function(){
                         yield self.api.cancelOrder(orders[i].id);
                     }
 
-                    self.stats.order.short++;
+                    self.stats.order.doten_short++;
                     result["open"] =  yield self.api.trade(
                         "btc_jpy",
                         "leverage_sell",
@@ -342,7 +342,7 @@ module.exports = (function(){
                         yield self.api.cancelOrder(orders[i].id);
                     }
 
-                    self.stats.order.long++;
+                    self.stats.order.doten_long++;
                     result["open"] = yield self.api.trade(
                         "btc_jpy",
                         "leverage_buy",
@@ -429,6 +429,8 @@ module.exports = (function(){
                 sell: 0,
                 long: 0,
                 short: 0,
+                doten_long: 0,
+                doten_short: 0,
             },
             cancel_order: 0,
             cancel_position: 0,
