@@ -82,7 +82,6 @@ module.exports = (function(){
             self.trades.push(trade);
             self.stats.update_trade_count++;
 
-            console.log(self.calcScore(self.trades, {}));
             if(self.trades.length <= 100){
                 resolve(self);
                 return;
