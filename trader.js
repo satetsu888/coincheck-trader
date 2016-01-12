@@ -127,6 +127,32 @@ module.exports = (function(){
         var self = this;
         var score = 0;
 
+        var trades_rate_sum = 0;
+        var trades_rate_ave;
+        var trades_rate_var = 0;
+        var trades_rate_sd = 0;
+        var trades_amount_sum = 0;
+        var trades_amount_ave;
+        var trades_amount_var = 0;
+        var trades_amount_sd = 0;
+
+        for(var i=0;i<trades.length;i++){
+            trades_rate_sum += trades[i].rate;
+            trades_amount_sum += trades[i].amount;
+        }
+
+        trades_rate_ave = trades_rate_sum / trades.length;
+        trades_amount_ave = trades_amount_sum / trades.length;
+
+        for(var i=0;i<trades.length;i++){
+            trades_rate_var += Math.pow(trades[i].rate - trades_rate_ave, 2);
+            trades_amount_var += Math.pow(trades[i].amount - trades_amount_ave, 2);
+        }
+        trades_rate_var = trades_rate_var / trades.length;
+        trades_amount_var = trades_amount_var / trades.length;
+        trades_rate_sd = Math.sqrt(trades_rate_var);
+        trades_amount_sd = Math.sqrt(trades_amount_var);
+
         var sign;
         trades.forEach(function(element, index){
             if( element.order_type == "buy"){
@@ -135,7 +161,7 @@ module.exports = (function(){
                 sign = -1;
             }
 
-            var delta = sign * element.amount * element.rate * self.entity[index] * self.calc_weight;
+            var delta = sign *  ( (element.amount - trades_amount_ave) / trades_amount_sd ) * ( (element.rate - trades_rate_ave) / trades_rate_sd ) * self.entity[index] * self.calc_weight;
             score += delta;
         });
         score += 10 * self.entity[100] * (self.current_yen / self.current_rate() - self.current_btc);
@@ -440,7 +466,7 @@ module.exports = (function(){
         this.api = promisify(option.api);
         this.publicApi = promisify(option.publicApi);
         this.logger = option.logger || undefined;
-        this.calc_weight = option.calc_weight || 0.0001;
+        this.calc_weight = option.calc_weight || 1;
         this.order_weight = option.order_weight || 0.0001;
         this.order_threshold = option.order_threshold || 100;
         this.close_threshold = option.close_threshold || this.order_threshold * 0.7;
