@@ -82,6 +82,7 @@ module.exports = (function(){
             self.trades.push(trade);
             self.stats.update_trade_count++;
 
+            console.log(self.calcScore(self.trades, {}));
             if(self.trades.length <= 100){
                 resolve(self);
                 return;
@@ -137,8 +138,8 @@ module.exports = (function(){
         var trades_amount_sd = 0;
 
         for(var i=0;i<trades.length;i++){
-            trades_rate_sum += trades[i].rate;
-            trades_amount_sum += trades[i].amount;
+            trades_rate_sum += parseFloat(trades[i].rate);
+            trades_amount_sum += parseFloat(trades[i].amount);
         }
 
         trades_rate_ave = trades_rate_sum / trades.length;
@@ -152,6 +153,7 @@ module.exports = (function(){
         trades_amount_var = trades_amount_var / trades.length;
         trades_rate_sd = Math.sqrt(trades_rate_var);
         trades_amount_sd = Math.sqrt(trades_amount_var);
+
 
         var sign;
         trades.forEach(function(element, index){
