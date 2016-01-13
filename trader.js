@@ -94,16 +94,7 @@ module.exports = (function(){
                 resolve(self);
                 return;
             }
-
-            self.createOrder(self.trades, function(err, trader){
-                if(err){
-                    reject(err);
-                    return;
-                } else {
-                    resolve(trader);
-                    return;
-                }
-            });
+            resolve(self);
         });
     };
 
@@ -111,8 +102,10 @@ module.exports = (function(){
         var self = this;
         return new Promise(function(resolve, reject){
             co(function* (){
-                yield self.applyTradesAsync();
                 yield self.updateTradesAsync(trade);
+                self.current_score = self.calcScore(self.trades, {});
+                yield self.applyTradesAsync();
+                yield self.createOrderAsync(self.trades);
                 yield self.updateLogAsync(self);
                 resolve(self);
             }).catch(function(err){
@@ -172,16 +165,30 @@ module.exports = (function(){
 
     var createOrder = function(trades, cb){
         var self = this;
-        self.current_score = self.calcScore(trades, {});
 
         if(self.mode == 'spot'){
             self._createSpotOrder(cb);
         } else if(self.mode == 'future'){
             self._createFutureOrder(cb);
         } else {
-            console.log('invalid mode');
+            console.log('invalid mode: ' + self.mode);
             cb('invalid mode', null);
         }
+    };
+
+    var createOrderAsync = function(trades){
+        var self = this;
+        return new Promise(function(resolve, reject){
+            self.createOrder(trades, function(err, result){
+                if(err){
+                    console.log(err);
+                    reject(err);
+                    return;
+                } else {
+                    resolve(result);
+                }
+            });
+        });
     };
 
     var _createSpotOrder = function(cb){
@@ -484,6 +491,7 @@ module.exports = (function(){
         this.updateAsync = updateAsync;
         this.calcScore = calcScore;
         this.createOrder = createOrder;
+        this.createOrderAsync = createOrderAsync;
         this.current_assetsAsync = current_assetsAsync;
         this.current_rate = current_rate;
         this.last_trade = last_trade;
