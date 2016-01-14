@@ -26,7 +26,9 @@ module.exports = (function(){
             _original_amount: amount,
             _status: "open",
         };
-        console.log(order);
+        if(this.vabose){
+            console.log(order);
+        }
 
         if(action == "leverage_buy" || action == "leverage_sell"){
             this.current_yen -= (amount * price) * 0.0005;
@@ -65,7 +67,9 @@ module.exports = (function(){
             _status: "open",
             _position_id: position_id,
         };
-        console.log(order);
+        if(this.vabose){
+            console.log(order);
+        }
         this.orders.push(order);
 
         setTimeout(callback, 1, null, result);
@@ -97,7 +101,9 @@ module.exports = (function(){
         this.orders.forEach(function(order){
             if(order.id == order_id){
                 order._status = "canceled";
-                console.log(order);
+                if(this.vabose){
+                    console.log(order);
+                }
 
                 result = {
                     "success": true,
@@ -291,7 +297,9 @@ module.exports = (function(){
                 this.open_positions[side] = null;
             }
         }
-        console.log("yen: " + this.current_yen);
+        if(this.vabose){
+            console.log("yen: " + this.current_yen);
+        }
     };
 
 
@@ -320,6 +328,7 @@ module.exports = (function(){
             sell: null
         };
         this.closed_posisions = [];
+        this.verbose = config.verbose || false;
     };
 
     return api;

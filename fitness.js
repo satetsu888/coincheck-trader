@@ -69,13 +69,12 @@ module.exports = (function(){
             myLogger = new logger(self.seriarize(entity) + '_' + self.file );
         };
         var option = {
-            calc_weight: 10,
+            calc_weight: 5,
             order_threshold: 100,
             order_allowed: true,
             order_weight: 0.0002,
             api: new api(config),
             logger: myLogger,
-            mode: 'future',
         };
 
         var trader = new Trader(entity, config, option);
