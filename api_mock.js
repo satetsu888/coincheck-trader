@@ -26,7 +26,7 @@ module.exports = (function(){
             _original_amount: amount,
             _status: "open",
         };
-        if(this.vabose){
+        if(this.verbose){
             console.log(order);
         }
 
@@ -67,7 +67,7 @@ module.exports = (function(){
             _status: "open",
             _position_id: position_id,
         };
-        if(this.vabose){
+        if(this.verbose){
             console.log(order);
         }
         this.orders.push(order);
@@ -96,12 +96,13 @@ module.exports = (function(){
     }
 
     var cancelOrder = function(order_id, callback){
+        var self = this;
         var result = {};
 
         this.orders.forEach(function(order){
             if(order.id == order_id){
                 order._status = "canceled";
-                if(this.vabose){
+                if(self.verbose){
                     console.log(order);
                 }
 
@@ -297,7 +298,7 @@ module.exports = (function(){
                 this.open_positions[side] = null;
             }
         }
-        if(this.vabose){
+        if(this.verbose){
             console.log("yen: " + this.current_yen);
         }
     };
