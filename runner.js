@@ -28,8 +28,8 @@ var setupTraderAsync = function(res){
     return new Promise(function(resolve, reject){
         var entity = JSON.parse(fs.readFileSync(bot, 'utf8'));
         var option = {
-            calc_weight: 0.0001,
-            order_threshold: 200,
+            calc_weight: 5,
+            order_threshold: 100,
             order_allowed: false,
             order_weight: 0.0002,
             api: privateApi,
